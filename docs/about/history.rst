@@ -15,12 +15,29 @@ Python's generators as they proved to work very well.
 The package has been hosted on Sourceforge.net since September 15th, 2002.
 In June 2012, the project moved to Bitbucket.org.
 
+3.0.11 - 2018-07-13
+===================
+
+- [FIX] Repair Environment.exit() to support PEP-479 and Python 3.7.
+- [FIX] Fix wrong usage_since calculation in preemptions
+- [NEW] Add "Time and Scheduling" section to docs
+- [CHANGE] Move Interrupt from events to exceptions
+- [FIX] Various minor documentation improvements
+
+
+3.0.10 – 2016-08-26
+===================
+
+- [FIX] Conditions no longer leak callbacks on events (thanks to Peter Grayson).
+
+
 3.0.9 – 2016-06-12
 ==================
 
 - [NEW] :class:`~simpy.resources.store.PriorityStore` resource and performance
   benchmarks were implemented by Peter Grayson.
 - [FIX] Support for identifying nested preemptions was added by Cristian Klein.
+
 
 3.0.8 – 2015-06-23
 ==================

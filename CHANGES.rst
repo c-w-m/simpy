@@ -1,6 +1,12 @@
 Changelog for SimPy
 ===================
 
+3.0.12 - 2020-03-12
+-------------------
+
+- [FIX] Fix URLs for GitLab.com and re-release
+
+
 3.0.11 - 2018-07-13
 -------------------
 

@@ -49,19 +49,12 @@ Preparations
    :file:`docs/about/history.rst`). Only keep changes for the current major
    release in :file:`CHANGES.txt` and reference the history page from there.
 
-#. Commit all changes:
-
-   .. code-block:: console
-
-    $ git add -u
-    $ git ci -m 'Updated change log for the upcoming release.'
-
 #. Update the version number in :file:`src/simpy/__init__.py` and
    :file:`setup.py` and commit:
 
    .. code-block:: bash
 
-    $ git add setu.py src/simpy/__init__py
+    $ git add setup.py src/simpy/__init__py
     $ git ci -m 'Bump version from x.y.z to a.b.c'
 
    .. warning::
