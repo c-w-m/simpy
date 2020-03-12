@@ -1,19 +1,17 @@
-syntax: glob
-
 *.egg-info/
 *.pyc
 *.pyo
 *.swp
 *~
-__pycache__
 .DS_Store
+.cache/
 .coverage
+.env
 .ropeproject/
 .tox/
-.cache/
 MANIFEST
+__pycache__
 build/
 dist/
 docs/_build/
 htmlcov/
-.env
