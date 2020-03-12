@@ -10,7 +10,7 @@ Preparations
 ============
 
 #. Close all `tickets for the next version
-   <https://bitbucket.org/simpy/simpy/issues?status=new&status=open>`_.
+   <https://gitlab.com/team-simpy/simpy/-/issues>`_.
 
 #. Update the *minium* required versions of dependencies in :file:`setup.py`.
    Update the *exact* version of all entries in :file:`requirements.txt`.
@@ -18,7 +18,7 @@ Preparations
 #. Run :command:`tox` from the project root. All tests for all supported
    versions must pass:
 
-   .. code-block:: bash
+   .. code-block:: console
 
     $ tox
     [...]
@@ -37,7 +37,7 @@ Preparations
 #. Build the docs (HTML is enough). Make sure there are no errors and undefined
    references.
 
-   .. code-block:: bash
+   .. code-block:: console
 
     $ cd docs/
     $ make clean html
@@ -51,16 +51,18 @@ Preparations
 
 #. Commit all changes:
 
+   .. code-block:: console
+
+    $ git add -u
+    $ git ci -m 'Updated change log for the upcoming release.'
+
+#. Update the version number in :file:`src/simpy/__init__.py` and
+   :file:`setup.py` and commit:
+
    .. code-block:: bash
 
-    $ hg ci -m 'Updated change log for the upcoming release.'
-
-#. Update the version number in :file:`simpy/__init__.py` and :file:`setup.py`
-   and commit:
-
-   .. code-block:: bash
-
-    $ hg ci -m 'Bump version from x.y.z to a.b.c'
+    $ git add setu.py src/simpy/__init__py
+    $ git ci -m 'Bump version from x.y.z to a.b.c'
 
    .. warning::
 
@@ -151,8 +153,8 @@ Post release
 
    .. code-block:: bash
 
-    $ hg tag a.b.c
-    $ hg push ssh://hg@bitbucket.org/simpy/simpy
+    $ git tag a.b.c
+    $ git push origin master --tags
 
 #. Activate the `documentation build
    <https://readthedocs.org/dashboard/simpy/versions/>`_ for the new version.
@@ -160,8 +162,3 @@ Post release
 #. Send the prepared email to the mailing list and post it on Google+.
 
 #. Update `Wikipedia <http://en.wikipedia.org/wiki/SimPy>`_ entries.
-
-#. Update `Python Wiki
-   <https://wiki.python.org/moin/UsefulModules#Scientific>`_
-
-#. Post something to Planet Python (e.g., via Stefan's blog).

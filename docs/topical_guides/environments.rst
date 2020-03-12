@@ -147,7 +147,7 @@ calls :meth:`~simpy.resources.resource.Resource.request()` to request
 a resource, the resource determines the requesting process via
 ``env.active_process``. Take a `look at the code`__ to see how we do this :-).
 
-__ https://bitbucket.org/simpy/simpy/src/3.0.2/simpy/resources/base.py#cl-35
+__ https://gitlab.com/team-simpy/simpy/-/blob/master/src/simpy/resources/base.py
 
 
 Event creation

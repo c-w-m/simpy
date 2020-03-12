@@ -7,9 +7,9 @@
 
         `News <https://plus.google.com/101634625602509193865>`_ |
         `PyPI <https://pypi.python.org/pypi/simpy>`_ |
-        `Bitbucket <https://bitbucket.org/simpy/simpy/>`_ |
+        `GitLab <https://gitlab.com/team-simpy/simpy/>`_ |
         `Issues
-        <https://bitbucket.org/simpy/simpy/issues?status=new&status=open>`_ |
+        <https://gitlab.com/groups/team-simpy/-/issues>`_ |
         `Mailing list <https://groups.google.com/forum/#!forum/python-simpy>`_
 
 ========

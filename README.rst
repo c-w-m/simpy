@@ -121,8 +121,8 @@ __ https://simpy.readthedocs.io/en/latest/api_reference/index.html
 __ https://simpy.readthedocs.io/en/latest/about/index.html
 __ https://simpy.readthedocs.io/
 __ mailto:python-simpy@googlegroups.com
-__ https://bitbucket.org/simpy/simpy/src
-__ https://bitbucket.org/simpy/simpy/issues?status=new&status=open
+__ https://gitlab.com/team-simpy/simpy/-/tree/master
+__ https://gitlab.com/team-simpy/simpy/-/issues
 
 Enjoy simulation programming in SimPy!
 

@@ -82,4 +82,4 @@ All examples
 
 You have ideas for better examples? Please send them to our `mailing list
 <https://lists.sourceforge.net/lists/listinfo/simpy-users>`_ or make a pull
-request on `bitbucket <https://bitbucket.org/simpy/simpy>`_.
+request on `GitLab <https://gitlab.com/team-simpy/simpy>`_.

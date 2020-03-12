@@ -318,5 +318,5 @@ Conclusion
 This guide is by no means complete. If you run into problems, please have
 a look at the other :doc:`guides <index>`, the :doc:`examples
 <../examples/index>` or the :doc:`../api_reference/index`. You are also very
-welcome to submit improvements. Just create a pull request at `bitbucket
-<https://bitbucket.org/simpy/simpy/>`_.
+welcome to submit improvements. Just create a merge request at `GitLab
+<https://gitlab.com/team-simpy/simpy/>`_.
