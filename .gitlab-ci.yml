@@ -40,6 +40,13 @@ python37:
     - pip install tox
     - tox -e 'py37'
 
+python38:
+  image: python:3.8
+  stage: test
+  script:
+    - pip install tox
+    - tox -e 'py38'
+
 pypy2:
   image: pypy:2
   stage: test
