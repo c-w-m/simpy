@@ -22,7 +22,7 @@ def pytest_collect_file(path, parent):
     """Checks if the file is a rst file and creates an
     :class:`ExampleFile` instance."""
     if path.ext == '.py' and path.dirname.endswith('code'):
-        return ExampleFile(path, parent)
+        return ExampleFile.from_parent(parent, fspath=path)
 
 
 class ExampleFile(pytest.File):
@@ -40,7 +40,7 @@ class ExampleFile(pytest.File):
             outfile = pyfile.new(ext='.out')
 
         if outfile.check():
-            yield ExampleItem(pyfile, outfile, self)
+            yield ExampleItem.from_parent(self, pyfile=pyfile, outfile=outfile)
 
 
 class ExampleItem(pytest.Item):
