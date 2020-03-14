@@ -105,7 +105,7 @@ Triggering events
 
 When events are triggered, they can either *succeed* or *fail*. For example, if
 an event is to be triggered at the end of a computation and everything works
-out fine, the event will *succeed*. If an exceptions occurs during that
+out fine, the event will *succeed*. If an exception occurs during that
 computation, the event will *fail*.
 
 To trigger an event and mark it as successful, you can use
