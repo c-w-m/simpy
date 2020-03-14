@@ -84,9 +84,9 @@ pattern *passivate / reactivate* in SimPy 3.
 Waiting for another process to terminate
 ========================================
 
-The example above has a problem: it may happen that the vehicles wants to park
+The example above has a problem: it may happen that the vehicle wants to park
 for a shorter duration than it takes to charge the battery (this is the case if
-both, charging and parking would take 60 to 90 minutes).
+both charging and parking would take 60 to 90 minutes).
 
 To fix this problem we have to slightly change our model. A new ``bat_ctrl()``
 will be started every time the EV starts parking. The EV then waits until the
