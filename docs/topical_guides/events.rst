@@ -105,7 +105,7 @@ Triggering events
 
 When events are triggered, they can either *succeed* or *fail*. For example, if
 an event is to be triggered at the end of a computation and everything works
-out fine, the event will *succeed*. If an exceptions occurs during that
+out fine, the event will *succeed*. If an exception occurs during that
 computation, the event will *fail*.
 
 To trigger an event and mark it as successful, you can use
@@ -224,16 +224,14 @@ The example from above, but with a delayed start of ``sub()``:
     ...     return 23
     ...
     >>> def parent(env):
-    ...     start = env.now
     ...     sub_proc = yield start_delayed(env, sub(env), delay=3)
-    ...     assert env.now - start == 3
-    ...
     ...     ret = yield sub_proc
     ...     return ret
     ...
     >>> env.run(env.process(parent(env)))
     23
 
+Pay attention to the additional ``yield`` needed for the helper process.
 
 .. _waiting_for_multiple_events_at_once:
 
@@ -242,13 +240,13 @@ Waiting for multiple events at once
 
 Sometimes, you want to wait for more than one event at the same time. For
 example, you may want to wait for a resource, but not for an unlimited amount
-of time. Or you may want to wait until all a set of events has happened.
+of time. Or you may want to wait until a set of events has happened.
 
 SimPy therefore offers the :class:`AnyOf` and :class:`AllOf` events which both
 are a :class:`Condition` event.
 
-Both take a list of events as an argument and are triggered if at least one or
-all of them of them are triggered.
+Both take a list of events as an argument and are triggered when any (at least one) or
+all of them are triggered.
 
 .. code-block:: python
 

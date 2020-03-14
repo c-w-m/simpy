@@ -57,7 +57,7 @@ current simulation time.
 The process function then yields the event and thus gets suspended. It is
 resumed, when SimPy processes the Timeout event. The process function also
 receives the event's value (42) -- this is, however, optional, so ``yield
-event`` would have been okay if the you were not interested in the value or if
+event`` would have been okay if you were not interested in the value or if
 the event had no value at all.
 
 Finally, the process function prints the current simulation time (that is
