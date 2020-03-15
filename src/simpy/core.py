@@ -6,7 +6,6 @@ import types
 from heapq import heappush, heappop
 from itertools import count
 
-from simpy.exceptions import StopProcess
 from simpy.events import (AllOf, AnyOf, Event, Process, Timeout, URGENT,
                           NORMAL)
 
@@ -143,16 +142,6 @@ class BaseEnvironment:
                 assert not until.triggered
                 raise RuntimeError('No scheduled events left but "until" '
                                    'event was not triggered: %s' % until)
-
-    def exit(self, value=None):
-        """Stop the current process, optionally providing a ``value``.
-
-        This is a convenience function provided for Python versions prior to
-        3.3. From Python 3.3, you can instead use ``return value`` in
-        a process.
-
-        """
-        raise StopProcess(value)
 
 
 class Environment(BaseEnvironment):

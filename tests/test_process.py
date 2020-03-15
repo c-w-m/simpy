@@ -62,25 +62,6 @@ def test_wait_for_proc(env):
     env.run()
 
 
-def test_exit(env):
-    """Processes can set a return value via an ``exit()`` function,
-    comparable to ``sys.exit()``.
-
-    """
-    def child(env):
-        yield env.timeout(1)
-        env.exit(env.now)
-
-    def parent(env):
-        result1 = yield env.process(child(env))
-        result2 = yield env.process(child(env))
-
-        assert [result1, result2] == [1, 2]
-
-    env.process(parent(env))
-    env.run()
-
-
 def test_return_value(env):
     """Processes can set a return value."""
     def child(env):
@@ -104,7 +85,7 @@ def test_child_exception(env):
             yield env.timeout(1)
             raise RuntimeError('Onoes!')
         except RuntimeError as err:
-            env.exit(err)
+            return err
 
     def parent(env):
         result = yield env.process(child(env))
@@ -174,7 +155,7 @@ def test_interrupted_join_and_rejoin(env):
 def test_error_and_interrupted_join(env):
     def child_a(env, process):
         process.interrupt()
-        env.exit()
+        return
         yield  # Dummy yield
 
     def child_b(env):

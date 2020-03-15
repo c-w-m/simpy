@@ -44,13 +44,13 @@ def moviegoer(env, movie, num_tickets, theater):
         # Check if it's our turn or if movie is sold out
         if my_turn not in result:
             theater.num_renegers[movie] += 1
-            env.exit()
+            return
 
         # Check if enough tickets left.
         if theater.available[movie] < num_tickets:
             # Moviegoer leaves after some discussion
             yield env.timeout(0.5)
-            env.exit()
+            return
 
         # Buy tickets
         theater.available[movie] -= num_tickets

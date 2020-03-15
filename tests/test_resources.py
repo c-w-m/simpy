@@ -97,7 +97,8 @@ def test_resource_continue_after_interrupt(env):
 
     def interruptor(env, proc):
         proc.interrupt()
-        yield env.exit(0)
+        return 0
+        yield
 
     res = simpy.Resource(env, 1)
     env.process(pem(env, res))
@@ -123,11 +124,11 @@ def test_resource_release_after_interrupt(env):
             # Dont wait for the resource
             res.release(evt)
             assert env.now == 0
-            env.exit()
 
     def interruptor(env, proc):
         proc.interrupt()
-        yield env.exit(0)
+        return 0
+        yield
 
     res = simpy.Resource(env, 1)
     env.process(blocker(env, res))
@@ -146,7 +147,7 @@ def test_resource_immediate_requests(env):
                 yield req
                 result.append(env.now)
                 yield env.timeout(1)
-        env.exit(result)
+        return result
 
     def parent(env):
         res = simpy.Resource(env, 1)

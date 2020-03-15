@@ -61,7 +61,7 @@ def test_triggered_timeout(env):
     def process(env):
         def child(env, event):
             value = yield event
-            env.exit(value)
+            return value
 
         event = env.timeout(1, 'i was already done')
         # Start the child after the timeout has already happened.

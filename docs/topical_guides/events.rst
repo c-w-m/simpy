@@ -202,9 +202,6 @@ process:
     >>> env.run(env.process(parent(env)))
     23
 
-The example above will only work in Python >= 3.3. As a workaround for older
-Python versions, you can use ``env.exit(23)`` with the same effect.
-
 When a process is created, it schedules an :class:`Initialize` event which will
 start the execution of the process when triggered. You usually won't have to
 deal with this type of event.

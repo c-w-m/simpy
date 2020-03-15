@@ -61,7 +61,7 @@ def test_concurrent_interrupts_and_events(env, log):
             try:
                 yield coup
                 log.append('coup completed at %d' % env.now)
-                env.exit()
+                return
             except simpy.Interrupt:
                 log.append('coup interrupted at %d' % env.now)
 
@@ -131,7 +131,7 @@ def test_multiple_interrupts(env):
         try:
             yield env.timeout(1)
         except simpy.Interrupt as i:
-            env.exit(i.cause)
+            return i.cause
 
     def parent(env):
         c = env.process(child(env))
@@ -166,7 +166,8 @@ def test_immediate_interrupt(env, log):
     def parent(env, log):
         child_proc = env.process(child(env, log))
         child_proc.interrupt()
-        yield env.exit()
+        return
+        yield
 
     env.process(parent(env, log))
     env.run()
@@ -205,7 +206,8 @@ def test_concurrent_behaviour(env):
     def proc_b(env, proc_a):
         for i in range(2):
             proc_a.interrupt()
-        yield env.exit()
+        return
+        yield
 
     proc_a = env.process(proc_a(env))
     env.process(proc_b(env, proc_a))

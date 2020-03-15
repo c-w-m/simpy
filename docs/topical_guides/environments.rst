@@ -189,17 +189,3 @@ used by other processes:
    def other_proc(env):
        ret_val = yield env.process(my_proc(env))
        assert ret_val == 42
-
-Internally, Python passes the return value as parameter to the
-:exc:`StopIteration` exception that it raises when a generator is exhausted. So
-in Python 2.7 and 3.2 you could replace the ``return 42`` with a ``raise
-StopIteration(42)`` to achieve the same result.
-
-To keep your code more readable, the environment provides the method
-:meth:`~Environment.exit()` to do exactly this:
-
-.. code-block:: python
-
-   def my_proc(env):
-       yield env.timeout(1)
-       env.exit(42)  # Py2 equivalent to "return 42"

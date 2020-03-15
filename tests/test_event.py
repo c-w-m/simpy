@@ -47,7 +47,8 @@ def test_fail(env):
 
 def test_names(env):
     def pem():
-        yield env.exit()
+        return
+        yield
 
     assert re.match(r'<Event\(\) object at 0x.*>', str(env.event()))
 
@@ -87,7 +88,7 @@ def test_unavailable_value(env):
 def test_triggered(env):
     def pem(env, event):
         value = yield event
-        env.exit(value)
+        return value
 
     event = env.event()
     event.succeed('i was already done')

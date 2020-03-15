@@ -13,7 +13,7 @@ from pkgutil import extend_path
 
 from simpy.core import Environment
 from simpy.rt import RealtimeEnvironment
-from simpy.exceptions import SimPyException, Interrupt, StopProcess
+from simpy.exceptions import SimPyException, Interrupt
 from simpy.events import Event, Timeout, Process, AllOf, AnyOf
 from simpy.resources.resource import (
     Resource, PriorityResource, PreemptiveResource)
@@ -46,7 +46,7 @@ toc = (
         PriorityItem, PriorityStore, FilterStore,
     )),
     ('Exceptions', (
-        SimPyException, Interrupt, StopProcess,
+        SimPyException, Interrupt
     )),
 )
 

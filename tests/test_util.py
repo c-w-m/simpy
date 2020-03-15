@@ -30,7 +30,7 @@ def test_subscribe(env):
     """Check async. interrupt if a process terminates."""
     def child(env):
         yield env.timeout(3)
-        env.exit('ohai')
+        return 'ohai'
 
     def parent(env):
         child_proc = env.process(child(env))

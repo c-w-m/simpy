@@ -36,7 +36,6 @@
         Return a new :class:`~simpy.events.AnyOf` condition for a list of
         *events*.
 
-    .. automethod:: exit
     .. automethod:: schedule
     .. automethod:: peek
     .. automethod:: step

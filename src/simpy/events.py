@@ -13,7 +13,7 @@ used, there are several specialized subclasses of it.
     ~simpy.events.AllOf
 
 """
-from simpy.exceptions import Interrupt, StopProcess
+from simpy.exceptions import Interrupt
 
 PENDING = object()
 """Unique object to identify pending values of events."""
@@ -282,12 +282,6 @@ class Process(Event):
     returns or raises an exception. The value of the process is the return
     value of the generator or the exception, respectively.
 
-    .. note::
-
-       Python version prior to 3.3 do not support return statements in
-       generators. You can use :meth:~simpy.core.Environment.exit() as
-       a workaround.
-
     Processes can be interrupted during their execution by :meth:`interrupt`.
 
     """
@@ -365,7 +359,7 @@ class Process(Event):
                     exc = type(event._value)(*event._value.args)
                     exc.__cause__ = event._value
                     event = self._generator.throw(exc)
-            except (StopIteration, StopProcess) as e:
+            except StopIteration as e:
                 # Process has terminated.
                 event = None
                 self._ok = True

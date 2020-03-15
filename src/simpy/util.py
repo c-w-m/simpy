@@ -35,7 +35,7 @@ def start_delayed(env, generator, delay):
     def starter():
         yield env.timeout(delay)
         proc = env.process(generator)
-        env.exit(proc)
+        return proc
 
     return env.process(starter())
 
