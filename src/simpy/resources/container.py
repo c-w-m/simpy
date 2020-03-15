@@ -24,7 +24,7 @@ class ContainerPut(base.Put):
         self.amount = amount
         """The amount of matter to be put into the container."""
 
-        super(ContainerPut, self).__init__(container)
+        super().__init__(container)
 
 
 class ContainerGet(base.Get):
@@ -40,7 +40,7 @@ class ContainerGet(base.Get):
         self.amount = amount
         """The amount of matter to be taken out of the container."""
 
-        super(ContainerGet, self).__init__(container)
+        super().__init__(container)
 
 
 class Container(base.BaseResource):
@@ -67,7 +67,7 @@ class Container(base.BaseResource):
         if init > capacity:
             raise ValueError('"init" must be <= "capacity".')
 
-        super(Container, self).__init__(env, capacity)
+        super().__init__(env, capacity)
 
         self._level = init
 

@@ -2,23 +2,17 @@
 Tests for SimPy's real-time behavior.
 
 """
-import time
-try:
-    # Python >= 3.3
-    from time import monotonic
-except ImportError:
-    # Python < 3.3
-    from time import time as monotonic
+from time import monotonic, sleep
 
 import pytest
 
 from simpy.rt import RealtimeEnvironment
 
 
-def process(env, log, sleep, timeout=1):
+def process(env, log, sleep_time, timeout=1):
     """Test process."""
     while True:
-        time.sleep(sleep)
+        sleep(sleep_time)
         yield env.timeout(timeout)
         log.append(env.now)
 
@@ -100,7 +94,7 @@ def test_rt_sync(log):
     """Test resetting the internal wall-clock reference time."""
     env = RealtimeEnvironment(factor=0.05)
     env.process(process(env, log, 0.01))
-    time.sleep(0.06)  # Simulate massiv workload :-)
+    sleep(0.06)  # Simulate massiv workload :-)
     env.sync()
     env.run(3)
 

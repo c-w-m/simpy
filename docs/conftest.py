@@ -30,14 +30,7 @@ class ExampleFile(pytest.File):
 
     def collect(self):
         pyfile = self.fspath
-
-        # Python 2's random number generator produces different numbers
-        # than Python 3's. Use a separate out-file for examples using
-        # random numbers.
-        if sys.version_info[0] < 3 and pyfile.new(ext='.out2').check():
-            outfile = pyfile.new(ext='.out2')
-        else:
-            outfile = pyfile.new(ext='.out')
+        outfile = pyfile.new(ext='.out')
 
         if outfile.check():
             yield ExampleItem.from_parent(self, pyfile=pyfile, outfile=outfile)

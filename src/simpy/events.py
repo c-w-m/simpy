@@ -13,12 +13,7 @@ used, there are several specialized subclasses of it.
     ~simpy.events.AllOf
 
 """
-from simpy._compat import PY2
 from simpy.exceptions import Interrupt, StopProcess
-
-if PY2:
-    import sys
-
 
 PENDING = object()
 """Unique object to identify pending values of events."""
@@ -29,7 +24,7 @@ NORMAL = 1
 """Default priority used by events."""
 
 
-class Event(object):
+class Event:
     """An event that may happen at some point in time.
 
     An event
@@ -303,9 +298,7 @@ class Process(Event):
             # in addition to the CPython type, which renders a type check
             # impractical. To workaround this issue, we check for attribute
             # name instead of type and optimistically assume that all objects
-            # with a ``throw`` attribute are generators (the more intuitive
-            # name ``__next__`` cannot be used because it was renamed from
-            # ``next`` in Python 2).
+            # with a ``throw`` attribute are generators.
             # Remove this workaround if it causes issues in production!
             raise ValueError('%s is not a generator.' % generator)
 
@@ -371,9 +364,6 @@ class Process(Event):
                     # processes.
                     exc = type(event._value)(*event._value.args)
                     exc.__cause__ = event._value
-                    if PY2:
-                        if hasattr(event._value, '__traceback__'):
-                            exc.__traceback__ = event._value.__traceback__
                     event = self._generator.throw(exc)
             except (StopIteration, StopProcess) as e:
                 # Process has terminated.
@@ -386,7 +376,7 @@ class Process(Event):
                 # Process has failed.
                 event = None
                 self._ok = False
-                tb = e.__traceback__ if not PY2 else sys.exc_info()[2]
+                tb = e.__traceback__
                 # Strip the frame of this function from the traceback as it
                 # does not add any useful information.
                 e.__traceback__ = tb.tb_next
@@ -419,7 +409,7 @@ class Process(Event):
         self.env._active_proc = None
 
 
-class ConditionValue(object):
+class ConditionValue:
     """Result of a :class:`~simpy.events.Condition`. It supports convenient
     dict-like access to the triggered events and their values. The events are
     ordered by their occurences in the condition."""
@@ -483,7 +473,7 @@ class Condition(Event):
 
     """
     def __init__(self, env, evaluate, events):
-        super(Condition, self).__init__(env)
+        super().__init__(env)
         self._evaluate = evaluate
         self._events = events if type(events) is tuple else tuple(events)
         self._count = 0
@@ -585,7 +575,7 @@ class AllOf(Condition):
 
     """
     def __init__(self, env, events):
-        super(AllOf, self).__init__(env, Condition.all_events, events)
+        super().__init__(env, Condition.all_events, events)
 
 
 class AnyOf(Condition):
@@ -595,7 +585,7 @@ class AnyOf(Condition):
 
     """
     def __init__(self, env, events):
-        super(AnyOf, self).__init__(env, Condition.any_events, events)
+        super().__init__(env, Condition.any_events, events)
 
 
 def _describe_frame(frame):

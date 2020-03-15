@@ -23,7 +23,7 @@ class StorePut(base.Put):
     def __init__(self, store, item):
         self.item = item
         """The item to put into the store."""
-        super(StorePut, self).__init__(store)
+        super().__init__(store)
 
 
 class StoreGet(base.Get):
@@ -47,7 +47,7 @@ class FilterStoreGet(StoreGet):
     def __init__(self, resource, filter=lambda item: True):
         self.filter = filter
         """The filter function to filter items in the store."""
-        super(FilterStoreGet, self).__init__(resource)
+        super().__init__(resource)
 
 
 class Store(base.BaseResource):
@@ -63,7 +63,7 @@ class Store(base.BaseResource):
         if capacity <= 0:
             raise ValueError('"capacity" must be > 0.')
 
-        super(Store, self).__init__(env, capacity)
+        super().__init__(env, capacity)
 
         self.items = []
         """List of the items available in the store."""

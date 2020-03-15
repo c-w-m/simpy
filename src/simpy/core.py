@@ -14,7 +14,7 @@ from simpy.events import (AllOf, AnyOf, Event, Process, Timeout, URGENT,
 Infinity = float('inf')  #: Convenience alias for infinity
 
 
-class BoundClass(object):
+class BoundClass:
     """Allows classes to behave like methods.
 
     The ``__get__()`` descriptor is basically identical to
@@ -60,7 +60,7 @@ class StopSimulation(Exception):
             raise event.value
 
 
-class BaseEnvironment(object):
+class BaseEnvironment:
     """Base class for event processing environments.
 
     An implementation must at least provide the means to access the current

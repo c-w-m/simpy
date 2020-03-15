@@ -70,7 +70,7 @@ each step:
 Installation
 ------------
 
-SimPy requires Python 2.7, 3.2, PyPy 2.0 or above.
+SimPy requires Python >= 3.6, both CPython and PyPy3 are known to work.
 
 You can install SimPy easily via `pip <http://pypi.python.org/pypi/pip>`_:
 

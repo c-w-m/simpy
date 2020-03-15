@@ -25,7 +25,7 @@ class Put(Event):
 
     """
     def __init__(self, resource):
-        super(Put, self).__init__(resource._env)
+        super().__init__(resource._env)
         self.resource = resource
         self.proc = self.env.active_process
 
@@ -69,7 +69,7 @@ class Get(Event):
 
     """
     def __init__(self, resource):
-        super(Get, self).__init__(resource._env)
+        super().__init__(resource._env)
         self.resource = resource
         self.proc = self.env.active_process
 
@@ -98,7 +98,7 @@ class Get(Event):
             self.resource.get_queue.remove(self)
 
 
-class BaseResource(object):
+class BaseResource:
     """Abstract base class for a shared resource.
 
     You can :meth:`put()` something into the resources or :meth:`get()`

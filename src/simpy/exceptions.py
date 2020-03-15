@@ -20,7 +20,7 @@ class Interrupt(SimPyException):
 
     """
     def __init__(self, cause):
-        super(Interrupt, self).__init__(cause)
+        super().__init__(cause)
 
     def __str__(self):
         return '%s(%r)' % (self.__class__.__name__, self.cause)
@@ -42,7 +42,7 @@ class StopProcess(SimPyException):
 
     """
     def __init__(self, value):
-        super(StopProcess, self).__init__(value)
+        super().__init__(value)
 
     def __str__(self):
         return '%s(%r)' % (self.__class__.__name__, self.value)

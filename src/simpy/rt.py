@@ -2,12 +2,7 @@
 with the real-time (aka *wall-clock time*).
 
 """
-try:
-    # Python >= 3.3
-    from time import monotonic as time, sleep
-except ImportError:
-    # Python < 3.3
-    from time import time, sleep
+from time import monotonic, sleep
 
 from simpy.core import Environment, EmptySchedule, Infinity
 
@@ -29,7 +24,7 @@ class RealtimeEnvironment(Environment):
         Environment.__init__(self, initial_time)
 
         self.env_start = initial_time
-        self.real_start = time()
+        self.real_start = monotonic()
         self._factor = factor
         self._strict = strict
 
@@ -53,7 +48,7 @@ class RealtimeEnvironment(Environment):
         calling :meth:`run()` or :meth:`step()`.
 
         """
-        self.real_start = time()
+        self.real_start = monotonic()
 
     def step(self):
         """Process the next event after enough real-time has passed for the
@@ -71,17 +66,17 @@ class RealtimeEnvironment(Environment):
 
         real_time = self.real_start + (evt_time - self.env_start) * self.factor
 
-        if self.strict and time() - real_time > self.factor:
+        if self.strict and monotonic() - real_time > self.factor:
             # Events scheduled for time *t* may take just up to *t+1*
             # for their computation, before an error is raised.
             raise RuntimeError('Simulation too slow for real time (%.3fs).' % (
-                time() - real_time))
+                monotonic() - real_time))
 
         # Sleep in a loop to fix inaccuracies of windows (see
         # http://stackoverflow.com/a/15967564 for details) and to ignore
         # interrupts.
         while True:
-            delta = real_time - time()
+            delta = real_time - monotonic()
             if delta <= 0:
                 break
             sleep(delta)

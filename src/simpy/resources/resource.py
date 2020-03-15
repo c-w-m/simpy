@@ -32,7 +32,7 @@ from simpy.core import BoundClass
 from simpy.resources import base
 
 
-class Preempted(object):
+class Preempted:
     """Cause of an preemption :class:`~simpy.exceptions.Interrupt` containing
     information about the preemption.
 
@@ -61,7 +61,7 @@ class Request(base.Put):
 
     """
     def __exit__(self, exc_type, value, traceback):
-        super(Request, self).__exit__(exc_type, value, traceback)
+        super().__exit__(exc_type, value, traceback)
         # Don't release the resource on generator cleanups. This seems to
         # create unclaimable circular references otherwise.
         if exc_type is not GeneratorExit:
@@ -76,7 +76,7 @@ class Release(base.Get):
     def __init__(self, resource, request):
         self.request = request
         """The request (:class:`Request`) that is to be released."""
-        super(Release, self).__init__(resource)
+        super().__init__(resource)
 
 
 class PriorityRequest(Request):
@@ -111,7 +111,7 @@ class PriorityRequest(Request):
         requests are more important) and finally the preemption flag (preempt
         requests are more important)."""
 
-        super(PriorityRequest, self).__init__(resource)
+        super().__init__(resource)
 
 
 class SortedQueue(list):
@@ -120,7 +120,7 @@ class SortedQueue(list):
 
     """
     def __init__(self, maxlen=None):
-        super(SortedQueue, self).__init__()
+        super().__init__()
         self.maxlen = maxlen
         """Maximum length of the queue."""
 
@@ -133,8 +133,8 @@ class SortedQueue(list):
         if self.maxlen is not None and len(self) >= self.maxlen:
             raise RuntimeError('Cannot append event. Queue is full.')
 
-        super(SortedQueue, self).append(item)
-        super(SortedQueue, self).sort(key=lambda e: e.key)
+        super().append(item)
+        super().sort(key=lambda e: e.key)
 
 
 class Resource(base.BaseResource):
@@ -152,7 +152,7 @@ class Resource(base.BaseResource):
         if capacity <= 0:
             raise ValueError('"capacity" must be > 0.')
 
-        super(Resource, self).__init__(env, capacity)
+        super().__init__(env, capacity)
 
         self.users = []
         """List of :class:`Request` events for the processes that are currently
@@ -203,7 +203,7 @@ class PriorityResource(Resource):
     :attr:`~simpy.resources.base.BaseResource.get_queue` for details."""
 
     def __init__(self, env, capacity=1):
-        super(PriorityResource, self).__init__(env, capacity)
+        super().__init__(env, capacity)
 
     request = BoundClass(PriorityRequest)
     """Request a usage slot with the given *priority*."""
@@ -230,4 +230,4 @@ class PreemptiveResource(PriorityResource):
                     by=event.proc, usage_since=preempt.usage_since,
                     resource=self))
 
-        return super(PreemptiveResource, self)._do_put(event)
+        return super()._do_put(event)

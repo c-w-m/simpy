@@ -241,21 +241,13 @@ def test_sys_excepthook(env):
         # Let the default exception hook print the traceback to the redirected
         # standard error channel.
         import sys
-        from simpy._compat import PY2
+        from io import StringIO
 
-        if PY2:
-            from io import BytesIO
-            stderr, sys.stderr = sys.stderr, BytesIO()
-        else:
-            from io import StringIO
-            stderr, sys.stderr = sys.stderr, StringIO()
+        stderr, sys.stderr = sys.stderr, StringIO()
 
         sys.excepthook(*sys.exc_info())
 
-        if PY2:
-            traceback = sys.stderr.getvalue().decode()
-        else:
-            traceback = sys.stderr.getvalue()
+        traceback = sys.stderr.getvalue()
 
         sys.stderr = stderr
 

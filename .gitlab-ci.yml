@@ -20,13 +20,6 @@ build:
     paths:
       - dist
 
-python27:
-  image: python:2.7
-  stage: test
-  script:
-    - pip install tox
-    - tox -e py27
-
 python36:
   image: python:3.6
   stage: test
@@ -47,13 +40,6 @@ python38:
   script:
     - pip install tox
     - tox -e py38
-
-pypy2:
-  image: pypy:2
-  stage: test
-  script:
-    - pip install tox
-    - tox -e pypy
 
 pypy3:
   image: pypy:3

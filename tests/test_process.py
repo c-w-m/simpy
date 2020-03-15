@@ -81,18 +81,11 @@ def test_exit(env):
     env.run()
 
 
-@pytest.mark.skipif('sys.version_info[:2] < (3, 3)')
 def test_return_value(env):
     """Processes can set a return value."""
-    # Python < 3.2 would raise a SyntaxError if this was real code ...
-    code = """def child(env):
+    def child(env):
         yield env.timeout(1)
         return env.now
-    """
-    globs, locs = {}, {}
-    code = compile(code, '<string>', 'exec')
-    eval(code, globs, locs)
-    child = locs['child']
 
     def parent(env):
         result1 = yield env.process(child(env))
