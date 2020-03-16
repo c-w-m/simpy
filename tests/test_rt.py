@@ -86,7 +86,7 @@ def test_rt_illegal_until():
     """Test illegal value for *until*."""
     env = RealtimeEnvironment()
     err = pytest.raises(ValueError, env.run, -1)
-    assert str(err.value) == ('until(=-1.0) should be > the current '
+    assert str(err.value) == ('until(=-1) must be > the current '
                               'simulation time.')
 
 

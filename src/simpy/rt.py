@@ -69,8 +69,10 @@ class RealtimeEnvironment(Environment):
         if self.strict and monotonic() - real_time > self.factor:
             # Events scheduled for time *t* may take just up to *t+1*
             # for their computation, before an error is raised.
-            raise RuntimeError('Simulation too slow for real time (%.3fs).' % (
-                monotonic() - real_time))
+            delta = monotonic() - real_time
+            raise RuntimeError(
+                f'Simulation too slow for real time ({delta:.3f}s).'
+            )
 
         # Sleep in a loop to fix inaccuracies of windows (see
         # http://stackoverflow.com/a/15967564 for details) and to ignore

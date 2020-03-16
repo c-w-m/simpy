@@ -23,7 +23,7 @@ class Interrupt(SimPyException):
         super().__init__(cause)
 
     def __str__(self):
-        return '%s(%r)' % (self.__class__.__name__, self.cause)
+        return f'{self.__class__.__name__}({self.cause!r})'
 
     @property
     def cause(self):

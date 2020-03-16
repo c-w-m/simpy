@@ -147,9 +147,9 @@ the number of current users and the resource's capacity:
    >>> res = simpy.Resource(env, capacity=1)
    >>>
    >>> def print_stats(res):
-   ...     print('%d of %d slots are allocated.' % (res.count, res.capacity))
-   ...     print('  Users:', res.users)
-   ...     print('  Queued events:', res.queue)
+   ...     print(f'{res.count} of {res.capacity} slots are allocated.')
+   ...     print(f'  Users: {res.users}')
+   ...     print(f'  Queued events: {res.queue}')
    >>>
    >>>
    >>> def user(res):
@@ -198,9 +198,9 @@ Apart from that, it works like a normal *Resource*:
    >>> def resource_user(name, env, resource, wait, prio):
    ...     yield env.timeout(wait)
    ...     with resource.request(priority=prio) as req:
-   ...         print('%s requesting at %s with priority=%s' % (name, env.now, prio))
+   ...         print(f'{name} requesting at {env.now} with priority={prio}')
    ...         yield req
-   ...         print('%s got resource at %s' % (name, env.now))
+   ...         print(f'{name} got resource at {env.now}')
    ...         yield env.timeout(3)
    ...
    >>> env = simpy.Environment()
@@ -232,16 +232,16 @@ they need to kick existing users out of the resource (this is called
    >>> def resource_user(name, env, resource, wait, prio):
    ...     yield env.timeout(wait)
    ...     with resource.request(priority=prio) as req:
-   ...         print('%s requesting at %s with priority=%s' % (name, env.now, prio))
+   ...         print(f'{name} requesting at {env.now} with priority={prio}')
    ...         yield req
-   ...         print('%s got resource at %s' % (name, env.now))
+   ...         print(f'{name} got resource at {env.now}')
    ...         try:
    ...             yield env.timeout(3)
    ...         except simpy.Interrupt as interrupt:
    ...             by = interrupt.cause.by
    ...             usage = env.now - interrupt.cause.usage_since
-   ...             print('%s got preempted by %s at %s after %s' %
-   ...                   (name, by, env.now, usage))
+   ...             print(f'{name} got preempted by {by} at {env.now}'
+   ...                   f' after {usage}')
    ...
    >>> env = simpy.Environment()
    >>> res = simpy.PreemptiveResource(env, capacity=1)
@@ -273,12 +273,14 @@ priority requests cannot queue-jump over high priority requests:
    >>> def user(name, env, res, prio, preempt):
    ...     with res.request(priority=prio, preempt=preempt) as req:
    ...         try:
-   ...             print('%s requesting at %d' % (name, env.now))
+   ...             print(f'{name} requesting at {env.now}')
+   ...             assert isinstance(env.now, int), type(env.now)
    ...             yield req
-   ...             print('%s got resource at %d' % (name, env.now))
+   ...             assert isinstance(env.now, int), type(env.now)
+   ...             print(f'{name} got resource at {env.now}')
    ...             yield env.timeout(3)
    ...         except simpy.Interrupt:
-   ...             print('%s got preempted at %d' % (name, env.now))
+   ...             print(f'{name} got preempted at {env.now}')
    >>>
    >>> env = simpy.Environment()
    >>> res = simpy.PreemptiveResource(env, capacity=1)
@@ -347,26 +349,26 @@ number of fuel dispensers (modeled as ``Resource``) and a tank modeled as
    ...     def monitor_tank(self, env):
    ...         while True:
    ...             if self.gas_tank.level < 100:
-   ...                 print('Calling tanker at %s' % env.now)
+   ...                 print(f'Calling tanker at {env.now}')
    ...                 env.process(tanker(env, self))
    ...             yield env.timeout(15)
    >>>
    >>>
    >>> def tanker(env, gas_station):
    ...     yield env.timeout(10)  # Need 10 Minutes to arrive
-   ...     print('Tanker arriving at %s' % env.now)
+   ...     print(f'Tanker arriving at {env.now}')
    ...     amount = gas_station.gas_tank.capacity - gas_station.gas_tank.level
    ...     yield gas_station.gas_tank.put(amount)
    >>>
    >>>
    >>> def car(name, env, gas_station):
-   ...     print('Car %s arriving at %s' % (name, env.now))
+   ...     print(f'Car {name} arriving at {env.now}')
    ...     with gas_station.fuel_dispensers.request() as req:
    ...         yield req
-   ...         print('Car %s starts refueling at %s' % (name, env.now))
+   ...         print(f'Car {name} starts refueling at {env.now}')
    ...         yield gas_station.gas_tank.get(40)
    ...         yield env.timeout(5)
-   ...         print('Car %s done refueling at %s' % (name, env.now))
+   ...         print(f'Car {name} done refueling at {env.now}')
    >>>
    >>>
    >>> def car_generator(env, gas_station):
@@ -422,8 +424,8 @@ Here is a simple example modelling a generic producer/consumer scenario:
    >>> def producer(env, store):
    ...     for i in range(100):
    ...         yield env.timeout(2)
-   ...         yield store.put('spam %s' % i)
-   ...         print('Produced spam at', env.now)
+   ...         yield store.put(f'spam {i}')
+   ...         print(f'Produced spam at', env.now)
    >>>
    >>>
    >>> def consumer(name, env, store):

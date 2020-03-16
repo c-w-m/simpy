@@ -20,7 +20,7 @@ class ContainerPut(base.Put):
     """
     def __init__(self, container, amount):
         if amount <= 0:
-            raise ValueError('amount(=%s) must be > 0.' % amount)
+            raise ValueError(f'amount(={amount}) must be > 0.')
         self.amount = amount
         """The amount of matter to be put into the container."""
 
@@ -36,7 +36,7 @@ class ContainerGet(base.Get):
     """
     def __init__(self, container, amount):
         if amount <= 0:
-            raise ValueError('amount(=%s) must be > 0.' % amount)
+            raise ValueError(f'amount(={amount}) must be > 0.')
         self.amount = amount
         """The amount of matter to be taken out of the container."""
 

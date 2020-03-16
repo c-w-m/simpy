@@ -18,7 +18,7 @@ def start_delayed(env, generator, delay):
         >>> from simpy import Environment
         >>> from simpy.util import start_delayed
         >>> def my_process(env, x):
-        ...     print('%s, %s' % (env.now, x))
+        ...     print(f'{env.now}, {x}')
         ...     yield env.timeout(1)
         ...
         >>> env = Environment()
@@ -30,7 +30,7 @@ def start_delayed(env, generator, delay):
 
     """
     if delay <= 0:
-        raise ValueError('delay(=%s) must be > 0.' % delay)
+        raise ValueError(f'delay(={delay}) must be > 0.')
 
     def starter():
         yield env.timeout(delay)
@@ -60,4 +60,4 @@ def subscribe_at(event):
     if event.callbacks is not None:
         env.process(signaller(event, subscriber))
     else:
-        raise RuntimeError('%s has already terminated.' % event)
+        raise RuntimeError(f'{event} has already terminated.')

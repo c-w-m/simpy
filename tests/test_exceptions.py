@@ -44,7 +44,7 @@ def test_no_parent_process(env):
             env.process(child(env))
             yield env.timeout(1)
         except Exception as err:
-            pytest.fail('There should be no error (%s).' % err)
+            pytest.fail(f'There should be no error ({err}).')
 
     env.process(parent(env))
     pytest.raises(ValueError, env.run)

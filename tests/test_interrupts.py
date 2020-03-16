@@ -60,10 +60,10 @@ def test_concurrent_interrupts_and_events(env, log):
         while True:
             try:
                 yield coup
-                log.append('coup completed at %d' % env.now)
+                log.append(f'coup completed at {env.now}')
                 return
             except simpy.Interrupt:
-                log.append('coup interrupted at %d' % env.now)
+                log.append(f'coup interrupted at {env.now}')
 
     def master_plan(env, fox, coup):
         yield env.timeout(1)

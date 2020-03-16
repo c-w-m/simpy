@@ -27,10 +27,12 @@ def compile_toc(entries, section_marker='='):
     autosummary directives."""
     toc = ''
     for section, objs in entries:
-        toc += '\n\n%s\n%s\n\n' % (section, section_marker * len(section))
+        toc += '\n\n'
+        toc += f'{section}\n'
+        toc += f'{section_marker * len(section)}\n\n'
         toc += '.. autosummary::\n\n'
         for obj in objs:
-            toc += '    ~%s.%s\n' % (obj.__module__, obj.__name__)
+            toc += f'    ~{obj.__module__}.{obj.__name__}\n'
     return toc
 
 

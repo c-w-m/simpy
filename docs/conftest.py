@@ -73,7 +73,7 @@ class ExampleItem(pytest.Item):
             return pytest.Item.repr_failure(self, exc_info)
 
     def reportinfo(self):
-        return self.fspath, None, '%s example' % self.pyfile.purebasename
+        return self.fspath, None, f'{self.pyfile.purebasename} example'
 
 
 class ReprFailExample(TerminalRepr):
@@ -95,7 +95,7 @@ class ReprFailExample(TerminalRepr):
             markup = ReprFailExample.Markup.get(line[0], {})
             tw.line(line, **markup)
         tw.line('')
-        tw.line('%s: Unexpected output' % (self.pyfile))
+        tw.line(f'{self.pyfile}: Unexpected output')
 
 
 class ReprErrorExample(TerminalRepr):
@@ -105,9 +105,9 @@ class ReprErrorExample(TerminalRepr):
         self.exc_info = exc_info
 
     def toterminal(self, tw):
-        tw.line('Execution of %s failed. Captured output:' %
-                self.pyfile.basename, red=True, bold=True)
+        tw.line('Execution of {self.pyfile.basename} failed. Captured output:',
+                red=True, bold=True)
         tw.sep('-')
         tw.line(self.exc_info.value.output)
-        tw.line('%s: Example failed (exitcode=%d)' %
-                (self.pyfile, self.exc_info.value.returncode))
+        rc = self.exc_info.value.returncode
+        tw.line(f'{self.pyfile}: Example failed (exitcode={rc})')

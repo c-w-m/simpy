@@ -64,11 +64,11 @@ class Event:
     def __repr__(self):
         """Return the description of the event (see :meth:`_desc`) with the id
         of the event."""
-        return '<%s object at 0x%x>' % (self._desc(), id(self))
+        return f'<{self._desc()} object at {id(self):#x}>'
 
     def _desc(self):
         """Return a string *Event()*."""
-        return '%s()' % self.__class__.__name__
+        return f'{self.__class__.__name__}()'
 
     @property
     def triggered(self):
@@ -124,7 +124,7 @@ class Event:
 
         """
         if self._value is PENDING:
-            raise AttributeError('Value of %s is not yet available' % self)
+            raise AttributeError(f'Value of {self} is not yet available')
         return self._value
 
     def trigger(self, event):
@@ -147,7 +147,7 @@ class Event:
 
         """
         if self._value is not PENDING:
-            raise RuntimeError('%s has already been triggered' % self)
+            raise RuntimeError(f'{self} has already been triggered')
 
         self._ok = True
         self._value = value
@@ -164,9 +164,9 @@ class Event:
 
         """
         if self._value is not PENDING:
-            raise RuntimeError('%s has already been triggered' % self)
+            raise RuntimeError(f'{self} has already been triggered')
         if not isinstance(exception, BaseException):
-            raise ValueError('%s is not an exception.' % exception)
+            raise ValueError(f'{exception} is not an exception.')
         self._ok = False
         self._value = exception
         self.env.schedule(self)
@@ -193,7 +193,7 @@ class Timeout(Event):
     """
     def __init__(self, env, delay, value=None):
         if delay < 0:
-            raise ValueError('Negative delay %s' % delay)
+            raise ValueError(f'Negative delay {delay}')
         # NOTE: The following initialization code is inlined from
         # Event.__init__() for performance reasons.
         self.env = env
@@ -205,9 +205,8 @@ class Timeout(Event):
 
     def _desc(self):
         """Return a string *Timeout(delay[, value=value])*."""
-        return '%s(%s%s)' % (self.__class__.__name__, self._delay,
-                             '' if self._value is None else
-                             (', value=%s' % self._value))
+        value_str = '' if self._value is None else f', value={self.value}'
+        return f'{self.__class__.__name__}({self._delay}{value_str})'
 
 
 class Initialize(Event):
@@ -247,8 +246,9 @@ class Interruption(Event):
         self._defused = True
 
         if process._value is not PENDING:
-            raise RuntimeError('%s has terminated and cannot be interrupted.' %
-                               process)
+            raise RuntimeError(
+                f'{process} has terminated and cannot be interrupted.'
+            )
 
         if process is self.env.active_process:
             raise RuntimeError('A process is not allowed to interrupt itself.')
@@ -294,7 +294,7 @@ class Process(Event):
             # name instead of type and optimistically assume that all objects
             # with a ``throw`` attribute are generators.
             # Remove this workaround if it causes issues in production!
-            raise ValueError('%s is not a generator.' % generator)
+            raise ValueError(f'{generator} is not a generator.')
 
         # NOTE: The following initialization code is inlined from
         # Event.__init__() for performance reasons.
@@ -309,7 +309,7 @@ class Process(Event):
 
     def _desc(self):
         """Return a string *Process(process_func_name)*."""
-        return '%s(%s)' % (self.__class__.__name__, self._generator.__name__)
+        return f'{self.__class__.__name__}({self._generator.__name__})'
 
     @property
     def target(self):
@@ -392,9 +392,9 @@ class Process(Event):
                 if hasattr(event, 'callbacks'):
                     raise
 
-                msg = 'Invalid yield value "%s"' % event
+                msg = f'Invalid yield value "{event}"'
                 descr = _describe_frame(self._generator.gi_frame)
-                error = RuntimeError('\n%s%s' % (descr, msg))
+                error = RuntimeError(f'\n{descr}{msg}')
                 # Drop the AttributeError as the cause for this exception.
                 error.__cause__ = None
                 raise error
@@ -427,7 +427,7 @@ class ConditionValue:
         return self.todict() == other
 
     def __repr__(self):
-        return '<ConditionValue %s>' % self.todict()
+        return f'<ConditionValue {self.todict()}>'
 
     def __iter__(self):
         return self.keys()
@@ -480,8 +480,10 @@ class Condition(Event):
         # Check if events belong to the same environment.
         for event in self._events:
             if self.env != event.env:
-                raise ValueError('It is not allowed to mix events from '
-                                 'different environments')
+                raise ValueError(
+                    'It is not allowed to mix events from different '
+                    'environments'
+                )
 
         # Check if the condition is met for each processed event. Attach
         # _check() as a callback otherwise.
@@ -497,8 +499,10 @@ class Condition(Event):
 
     def _desc(self):
         """Return a string *Condition(evaluate, [events])*."""
-        return '%s(%s, %s)' % (self.__class__.__name__,
-                               self._evaluate.__name__, self._events)
+        return (
+            f'{self.__class__.__name__}('
+            f'{self._evaluate.__name__}, {self._events})'
+        )
 
     def _populate_value(self, value):
         """Populate the *value* by recursively visiting all nested
@@ -592,5 +596,7 @@ def _describe_frame(frame):
             if no + 1 == lineno:
                 break
 
-    return '  File "%s", line %d, in %s\n    %s\n' % (filename, lineno, name,
-                                                      line.strip())
+    return (
+        f'  File "{filename}", line {lineno}, in {name}\n'
+        f'    {line.strip()}\n'
+    )

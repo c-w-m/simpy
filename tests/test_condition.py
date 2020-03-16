@@ -92,7 +92,7 @@ def test_nested_cond_with_error(env):
 def test_cond_with_error(env):
     def explode(env, delay):
         yield env.timeout(delay)
-        raise ValueError('Onoes, failed after %d!' % delay)
+        raise ValueError(f'Onoes, failed after {delay}!')
 
     def process(env):
         try:
@@ -108,7 +108,7 @@ def test_cond_with_error(env):
 def test_cond_with_nested_error(env):
     def explode(env, delay):
         yield env.timeout(delay)
-        raise ValueError('Onoes, failed after %d!' % delay)
+        raise ValueError(f'Onoes, failed after {delay}!')
 
     def process(env):
         try:
@@ -128,7 +128,7 @@ def test_cond_with_uncaught_error(env):
     handled by the condition and cause the simulation to crash."""
     def explode(env, delay):
         yield env.timeout(delay)
-        raise ValueError('Onoes, failed after %d!' % delay)
+        raise ValueError(f'Onoes, failed after {delay}!')
 
     def process(env):
         yield env.timeout(1) | env.process(explode(env, 2))

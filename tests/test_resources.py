@@ -628,16 +628,16 @@ def test_filter_calls_best_case(env):
     log = []
 
     def log_filter(item):
-        log.append('check %s' % item)
+        log.append(f'check {item}')
         return True
 
     store = simpy.FilterStore(env)
     store.items = [1, 2, 3]
 
     def getter(store):
-        log.append('get %s' % (yield store.get(log_filter)))
-        log.append('get %s' % (yield store.get(log_filter)))
-        log.append('get %s' % (yield store.get(log_filter)))
+        log.append(f'get {yield store.get(log_filter)}')
+        log.append(f'get {yield store.get(log_filter)}')
+        log.append(f'get {yield store.get(log_filter)}')
 
     env.process(getter(store))
     env.run()
@@ -654,15 +654,15 @@ def test_filter_calls_worst_case(env):
 
     def putter(store):
         for i in range(4):
-            log.append('put %s' % i)
+            log.append(f'put {i}')
             yield store.put(i)
 
     def log_filter(item):
-        log.append('check %s' % item)
+        log.append(f'check {item}')
         return item >= 3
 
     def getter(store):
-        log.append('get %s' % (yield store.get(log_filter)))
+        log.append(f'get {yield store.get(log_filter)}')
 
     env.process(getter(store))
     env.process(putter(store))

@@ -114,11 +114,15 @@ class BaseEnvironment:
             if not isinstance(until, Event):
                 # Assume that *until* is a number if it is not None and
                 # not an event.  Create a Timeout(until) in this case.
-                at = float(until)
+                if isinstance(until, int):
+                    at = until
+                else:
+                    at = float(until)
 
                 if at <= self.now:
-                    raise ValueError('until(=%s) should be > the current '
-                                     'simulation time.' % at)
+                    raise ValueError(
+                        f'until(={at}) must be > the current simulation time.'
+                    )
 
                 # Schedule the event before all regular timeouts.
                 until = Event(self)
@@ -140,8 +144,10 @@ class BaseEnvironment:
         except EmptySchedule:
             if until is not None:
                 assert not until.triggered
-                raise RuntimeError('No scheduled events left but "until" '
-                                   'event was not triggered: %s' % until)
+                raise RuntimeError(
+                    f'No scheduled events left but "until" event was not '
+                    f'triggered: {until}'
+                )
 
 
 class Environment(BaseEnvironment):
