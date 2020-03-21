@@ -51,106 +51,15 @@ class StopSimulation(Exception):
 
     @classmethod
     def callback(cls, event):
-        """Used as callback in :meth:`BaseEnvironment.run()` to stop the
-        simulation when the *until* event occurred."""
+        """Used as callback in :meth:`Environment.run()` to stop the simulation
+        when the *until* event occurred."""
         if event.ok:
             raise cls(event.value)
         else:
             raise event.value
 
 
-class BaseEnvironment:
-    """Base class for event processing environments.
-
-    An implementation must at least provide the means to access the current
-    time of the environment (see :attr:`now`) and to schedule (see
-    :meth:`schedule()`) events as well as processing them (see :meth:`step()`.
-
-    The class is meant to be subclassed for different execution environments.
-    For example, SimPy defines a :class:`Environment` for simulations with
-    a virtual time and and a :class:`~simpy.rt.RealtimeEnvironment` that
-    schedules and executes events in real (e.g., wallclock) time.
-
-    """
-    @property
-    def now(self):
-        """The current time of the environment."""
-        raise NotImplementedError(self)
-
-    @property
-    def active_process(self):
-        """The currently active process of the environment."""
-        raise NotImplementedError(self)
-
-    def schedule(self, event, priority=NORMAL, delay=0):
-        """Schedule an *event* with a given *priority* and a *delay*.
-
-        There are two default priority values, :data:`~simpy.events.URGENT` and
-        :data:`~simpy.events.NORMAL`.
-
-        """
-        raise NotImplementedError(self)
-
-    def step(self):
-        """Processes the next event."""
-        raise NotImplementedError(self)
-
-    def run(self, until=None):
-        """Executes :meth:`step()` until the given criterion *until* is met.
-
-        - If it is ``None`` (which is the default), this method will return
-          when there are no further events to be processed.
-
-        - If it is an :class:`~simpy.events.Event`, the method will continue
-          stepping until this event has been triggered and will return its
-          value.  Raises a :exc:`RuntimeError` if there are no further events
-          to be processed and the *until* event was not triggered.
-
-        - If it is a number, the method will continue stepping
-          until the environment's time reaches *until*.
-
-        """
-        if until is not None:
-            if not isinstance(until, Event):
-                # Assume that *until* is a number if it is not None and
-                # not an event.  Create a Timeout(until) in this case.
-                if isinstance(until, int):
-                    at = until
-                else:
-                    at = float(until)
-
-                if at <= self.now:
-                    raise ValueError(
-                        f'until(={at}) must be > the current simulation time.'
-                    )
-
-                # Schedule the event before all regular timeouts.
-                until = Event(self)
-                until._ok = True
-                until._value = None
-                self.schedule(until, URGENT, at - self.now)
-
-            elif until.callbacks is None:
-                # Until event has already been processed.
-                return until.value
-
-            until.callbacks.append(StopSimulation.callback)
-
-        try:
-            while True:
-                self.step()
-        except StopSimulation as exc:
-            return exc.args[0]  # == until.value
-        except EmptySchedule:
-            if until is not None:
-                assert not until.triggered
-                raise RuntimeError(
-                    f'No scheduled events left but "until" event was not '
-                    f'triggered: {until}'
-                )
-
-
-class Environment(BaseEnvironment):
+class Environment:
     """Execution environment for an event-based simulation. The passing of time
     is simulated by stepping from event to event.
 
@@ -223,3 +132,57 @@ class Environment(BaseEnvironment):
             exc = type(event._value)(*event._value.args)
             exc.__cause__ = event._value
             raise exc
+
+    def run(self, until=None):
+        """Executes :meth:`step()` until the given criterion *until* is met.
+
+        - If it is ``None`` (which is the default), this method will return
+          when there are no further events to be processed.
+
+        - If it is an :class:`~simpy.events.Event`, the method will continue
+          stepping until this event has been triggered and will return its
+          value.  Raises a :exc:`RuntimeError` if there are no further events
+          to be processed and the *until* event was not triggered.
+
+        - If it is a number, the method will continue stepping
+          until the environment's time reaches *until*.
+
+        """
+        if until is not None:
+            if not isinstance(until, Event):
+                # Assume that *until* is a number if it is not None and
+                # not an event.  Create a Timeout(until) in this case.
+                if isinstance(until, int):
+                    at = until
+                else:
+                    at = float(until)
+
+                if at <= self.now:
+                    raise ValueError(
+                        f'until(={at}) must be > the current simulation time.'
+                    )
+
+                # Schedule the event before all regular timeouts.
+                until = Event(self)
+                until._ok = True
+                until._value = None
+                self.schedule(until, URGENT, at - self.now)
+
+            elif until.callbacks is None:
+                # Until event has already been processed.
+                return until.value
+
+            until.callbacks.append(StopSimulation.callback)
+
+        try:
+            while True:
+                self.step()
+        except StopSimulation as exc:
+            return exc.args[0]  # == until.value
+        except EmptySchedule:
+            if until is not None:
+                assert not until.triggered
+                raise RuntimeError(
+                    f'No scheduled events left but "until" event was not '
+                    f'triggered: {until}'
+                )

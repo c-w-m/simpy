@@ -8,11 +8,9 @@ A simulation environment manages the simulation time as well as the scheduling
 and processing of events. It also provides means to step through or execute the
 simulation.
 
-The base class for all environments is :class:`~simpy.core.BaseEnvironment`.
-"Normal" simulations usually use its subclass
-:class:`~simpy.core.Environment`. For real-time simulations, SimPy provides a
-:class:`~simpy.rt.RealtimeEnvironment` (more on that in
-:doc:`real-time-simulations`).
+Normal simulations use :class:`~simpy.core.Environment`. For real-time
+simulations, SimPy provides a :class:`~simpy.rt.RealtimeEnvironment` (more on
+that in :doc:`real-time-simulations`).
 
 
 .. _simulation-control:

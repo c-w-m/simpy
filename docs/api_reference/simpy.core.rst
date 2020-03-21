@@ -4,9 +4,6 @@
 
 .. automodule:: simpy.core
 
-.. autoclass:: BaseEnvironment
-    :members:
-
 .. autoclass:: Environment
 
     .. autoattribute:: now
