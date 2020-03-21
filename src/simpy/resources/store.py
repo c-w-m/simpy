@@ -89,17 +89,16 @@ class Store(base.BaseResource):
         def put(  # type: ignore[override] # noqa: F821
             self, item: Any
         ) -> StorePut:
+            """Request to put *item* into the store."""
             return StorePut(self, item)
 
         def get(self) -> StoreGet:  # type: ignore[override] # noqa: F821
+            """Request to get an *item* out of the store."""
             return StoreGet(self)
 
     else:
         put = BoundClass(StorePut)
-        """Request to put *item* into the store."""
-
         get = BoundClass(StoreGet)
-        """Request to get an *item* out of the store."""
 
     def _do_put(self, event: StorePut) -> Optional[bool]:
         if len(self.items) < self._capacity:
@@ -186,12 +185,12 @@ class FilterStore(Store):
         def get(
             self, filter: Callable[[Any], bool] = lambda item: True
         ) -> FilterStoreGet:
+            """Request to get an *item*, for which *filter* returns ``True``,
+            out of the store."""
             return FilterStoreGet(self, filter)
 
     else:
         get = BoundClass(FilterStoreGet)
-        """Request to get an *item*, for which *filter* returns ``True``, out of
-        the store."""
 
     def _do_get(  # type: ignore[override] # noqa: F821
         self, event: FilterStoreGet

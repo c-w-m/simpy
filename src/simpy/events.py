@@ -30,7 +30,7 @@ from typing import (
 
 from simpy.exceptions import Interrupt
 
-if TYPE_CHECKING:  # Avoid circular import
+if TYPE_CHECKING and TYPE_CHECKING != 'SPHINX':  # Avoid circular import
     from simpy.core import Environment, SimTime
 
 PENDING: object = object()

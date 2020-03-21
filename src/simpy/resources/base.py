@@ -178,19 +178,20 @@ class BaseResource(Generic[PutType, GetType]):
     if TYPE_CHECKING:
 
         def put(self) -> Put:
+            """Request to put something into the resource and return a
+            :class:`Put` event, which gets triggered once the request
+            succeeds."""
             return Put(self)
 
         def get(self) -> Get:
+            """Request to get something from the resource and return a
+            :class:`Get` event, which gets triggered once the request
+            succeeds."""
             return Get(self)
 
     else:
         put = BoundClass(Put)
-        """Request to put something into the resource and return a
-        :class:`Put` event, which gets triggered once the request succeeds."""
-
         get = BoundClass(Get)
-        """Request to get something from the resource and return a :class:`Get`
-        event, which gets triggered once the request succeeds."""
 
     def _do_put(self, event: PutType) -> Optional[bool]:
         """Perform the *put* operation.

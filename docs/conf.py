@@ -15,6 +15,13 @@
 import datetime
 import os
 import sys
+import typing
+
+# This is used to allow the type checking stubs for various BoundClass methods
+# to be used in the Sphinx documentation in place of the true BoundClass
+# instance attributes. The 'SPHINX' value is used to distinguish sphinx-time
+# versus real type checking-time so that circular imports may still be avoided.
+typing.TYPE_CHECKING = 'SPHINX'
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the

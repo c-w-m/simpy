@@ -94,19 +94,18 @@ class Container(base.BaseResource):
         def put(  # type: ignore[override] # noqa: F821
             self, amount: ContainerAmount
         ) -> ContainerPut:
+            """Request to put *amount* of matter into the container."""
             return ContainerPut(self, amount)
 
         def get(  # type: ignore[override] # noqa: F821
             self, amount: ContainerAmount
         ) -> ContainerGet:
+            """Request to get *amount* of matter out of the container."""
             return ContainerGet(self, amount)
 
     else:
         put = BoundClass(ContainerPut)
-        """Request to put *amount* of matter into the container."""
-
         get = BoundClass(ContainerGet)
-        """Request to get *amount* of matter out of the container."""
 
     def _do_put(self, event: ContainerPut) -> Optional[bool]:
         if self._capacity - self._level >= event.amount:

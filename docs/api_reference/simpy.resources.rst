@@ -56,7 +56,7 @@ Stores --- ``simpy.resources.store``
 .. automodule:: simpy.resources.store
 
 .. autoclass:: Store
-   :members:
+   :members: items, capacity, get, put
 
 .. autoclass:: PriorityItem(priority, item)
    :members: priority, item

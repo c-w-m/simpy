@@ -194,17 +194,16 @@ class Resource(base.BaseResource):
     if TYPE_CHECKING:
 
         def request(self) -> Request:
+            """Request a usage slot."""
             return Request(self)
 
         def release(self, request: Request) -> Release:
+            """Release a usage slot."""
             return Release(self, request)
 
     else:
         request = BoundClass(Request)
-        """Request a usage slot."""
-
         release = BoundClass(Release)
-        """Release a usage slot."""
 
     def _do_put(self, event: Request) -> None:
         if len(self.users) < self.capacity:
@@ -245,19 +244,18 @@ class PriorityResource(Resource):
         def request(
             self, priority: int = 0, preempt: bool = True
         ) -> PriorityRequest:
+            """Request a usage slot with the given *priority*."""
             return PriorityRequest(self, priority, preempt)
 
         def release(  # type: ignore[override] # noqa: F821
             self, request: PriorityRequest
         ) -> Release:
+            """Release a usage slot."""
             return Release(self, request)
 
     else:
         request = BoundClass(PriorityRequest)
-        """Request a usage slot with the given *priority*."""
-
         release = BoundClass(Release)
-        """Release a usage slot."""
 
 
 class PreemptiveResource(PriorityResource):
