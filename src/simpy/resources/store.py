@@ -143,11 +143,11 @@ class FilterStore(Store):
     """
 
     put = BoundClass(StorePut)
-    """Request a to put *item* into the store."""
+    """Request to put *item* into the store."""
 
     get = BoundClass(FilterStoreGet)
-    """Request a to get an *item*, for which *filter* returns ``True``, out of
-    the store."""
+    """Request to get an *item*, for which *filter* returns ``True``, out of the
+    store."""
 
     def _do_get(self, event):
         for item in self.items:
