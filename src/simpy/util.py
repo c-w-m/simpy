@@ -5,9 +5,15 @@ A collection of utility functions:
    start_delayed
 
 """
+from typing import Generator
+
+from simpy.core import Environment, SimTime
+from simpy.events import Event, Process, ProcessGenerator
 
 
-def start_delayed(env, generator, delay):
+def start_delayed(
+    env: Environment, generator: ProcessGenerator, delay: SimTime
+) -> Process:
     """Return a helper process that starts another process for *generator*
     after a certain *delay*.
 
@@ -32,7 +38,7 @@ def start_delayed(env, generator, delay):
     if delay <= 0:
         raise ValueError(f'delay(={delay}) must be > 0.')
 
-    def starter():
+    def starter() -> Generator[Event, None, Process]:
         yield env.timeout(delay)
         proc = env.process(generator)
         return proc
@@ -40,7 +46,7 @@ def start_delayed(env, generator, delay):
     return env.process(starter())
 
 
-def subscribe_at(event):
+def subscribe_at(event: Event) -> None:
     """Register at the *event* to receive an interrupt when it occurs.
 
     The most common use case for this is to pass
@@ -50,9 +56,10 @@ def subscribe_at(event):
 
     """
     env = event.env
+    assert env.active_process is not None
     subscriber = env.active_process
 
-    def signaller(signaller, receiver):
+    def signaller(signaller: Event, receiver: Process) -> ProcessGenerator:
         result = yield signaller
         if receiver.is_alive:
             receiver.interrupt((signaller, result))

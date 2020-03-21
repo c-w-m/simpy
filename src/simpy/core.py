@@ -2,18 +2,41 @@
 Core components for event-discrete simulation environments.
 
 """
-import types
 from heapq import heappush, heappop
 from itertools import count
+from types import MethodType
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Generic,
+    Iterable,
+    List,
+    Optional,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+)
 
-from simpy.events import (AllOf, AnyOf, Event, Process, Timeout, URGENT,
-                          NORMAL)
+from simpy.events import (
+    AllOf,
+    AnyOf,
+    Event,
+    EventPriority,
+    Process,
+    ProcessGenerator,
+    Timeout,
+    URGENT,
+    NORMAL,
+)
 
 
-Infinity = float('inf')  #: Convenience alias for infinity
+Infinity: float = float('inf')  #: Convenience alias for infinity
+
+T = TypeVar('T')
 
 
-class BoundClass:
+class BoundClass(Generic[T]):
     """Allows classes to behave like methods.
 
     The ``__get__()`` descriptor is basically identical to
@@ -21,20 +44,24 @@ class BoundClass:
     descriptor instance.
 
     """
-    def __init__(self, cls):
+
+    def __init__(self, cls: Type[T]):
         self.cls = cls
 
-    def __get__(self, obj, type=None):
-        if obj is None:
+    def __get__(
+        self,
+        instance: Optional['BoundClass'],
+        owner: Optional[Type['BoundClass']] = None,
+    ) -> Union[Type[T], MethodType]:
+        if instance is None:
             return self.cls
-        return types.MethodType(self.cls, obj)
+        return MethodType(self.cls, instance)
 
     @staticmethod
-    def bind_early(instance):
+    def bind_early(instance: object) -> None:
         """Bind all :class:`BoundClass` attributes of the *instance's* class
         to the instance itself to increase performance."""
-        cls = type(instance)
-        for name, obj in cls.__dict__.items():
+        for name, obj in instance.__class__.__dict__.items():
             if type(obj) is BoundClass:
                 bound_class = getattr(instance, name)
                 setattr(instance, name, bound_class)
@@ -43,20 +70,22 @@ class BoundClass:
 class EmptySchedule(Exception):
     """Thrown by an :class:`Environment` if there are no further events to be
     processed."""
-    pass
 
 
 class StopSimulation(Exception):
     """Indicates that the simulation should stop now."""
 
     @classmethod
-    def callback(cls, event):
+    def callback(cls, event: Event) -> None:
         """Used as callback in :meth:`Environment.run()` to stop the simulation
         when the *until* event occurred."""
         if event.ok:
             raise cls(event.value)
         else:
-            raise event.value
+            raise event._value
+
+
+SimTime = Union[int, float]
 
 
 class Environment:
@@ -70,37 +99,69 @@ class Environment:
     :attr:`process`, :attr:`timeout` and :attr:`event`.
 
     """
-    def __init__(self, initial_time=0):
+
+    def __init__(self, initial_time: SimTime = 0):
         self._now = initial_time
-        self._queue = []  # The list of all currently scheduled events.
+        self._queue: List[
+            Tuple[SimTime, EventPriority, int, Event]
+        ] = []  # The list of all currently scheduled events.
         self._eid = count()  # Counter for event IDs
-        self._active_proc = None
+        self._active_proc: Optional[Process] = None
 
         # Bind all BoundClass instances to "self" to improve performance.
         BoundClass.bind_early(self)
 
     @property
-    def now(self):
+    def now(self) -> SimTime:
         """The current simulation time."""
         return self._now
 
     @property
-    def active_process(self):
+    def active_process(self) -> Optional[Process]:
         """The currently active process of the environment."""
         return self._active_proc
 
-    process = BoundClass(Process)
-    timeout = BoundClass(Timeout)
-    event = BoundClass(Event)
-    all_of = BoundClass(AllOf)
-    any_of = BoundClass(AnyOf)
+    if TYPE_CHECKING:
+        # This block is only evaluated when type checking with, e.g. Mypy.
+        # These are the effective types of the methods created with BoundClass
+        # magic and are thus a useful reference for SimPy users as well as for
+        # static type checking.
 
-    def schedule(self, event, priority=NORMAL, delay=0):
+        def process(self, generator: ProcessGenerator) -> Process:
+            return Process(self, generator)
+
+        def timeout(
+            self, delay: SimTime = 0, value: Optional[Any] = None
+        ) -> Timeout:
+            return Timeout(self, delay, value)
+
+        def event(self) -> Event:
+            return Event(self)
+
+        def all_of(self, events: Iterable[Event]) -> AllOf:
+            return AllOf(self, events)
+
+        def any_of(self, events: Iterable[Event]) -> AnyOf:
+            return AnyOf(self, events)
+
+    else:
+        process = BoundClass(Process)
+        timeout = BoundClass(Timeout)
+        event = BoundClass(Event)
+        all_of = BoundClass(AllOf)
+        any_of = BoundClass(AnyOf)
+
+    def schedule(
+        self,
+        event: Event,
+        priority: EventPriority = NORMAL,
+        delay: SimTime = 0,
+    ) -> None:
         """Schedule an *event* with a given *priority* and a *delay*."""
         heappush(self._queue,
                  (self._now + delay, priority, next(self._eid), event))
 
-    def peek(self):
+    def peek(self) -> SimTime:
         """Get the time of the next scheduled event. Return
         :data:`~simpy.core.Infinity` if there is no further event."""
         try:
@@ -108,7 +169,7 @@ class Environment:
         except IndexError:
             return Infinity
 
-    def step(self):
+    def step(self) -> None:
         """Process the next event.
 
         Raise an :exc:`EmptySchedule` if no further events are available.
@@ -121,7 +182,7 @@ class Environment:
 
         # Process callbacks of the event. Set the events callbacks to None
         # immediately to prevent concurrent modifications.
-        callbacks, event.callbacks = event.callbacks, None
+        callbacks, event.callbacks = event.callbacks, None  # type: ignore
         for callback in callbacks:
             callback(event)
 
@@ -133,7 +194,9 @@ class Environment:
             exc.__cause__ = event._value
             raise exc
 
-    def run(self, until=None):
+    def run(
+        self, until: Optional[Union[SimTime, Event]] = None
+    ) -> Optional[Any]:
         """Executes :meth:`step()` until the given criterion *until* is met.
 
         - If it is ``None`` (which is the default), this method will return
@@ -152,6 +215,7 @@ class Environment:
             if not isinstance(until, Event):
                 # Assume that *until* is a number if it is not None and
                 # not an event.  Create a Timeout(until) in this case.
+                at: SimTime
                 if isinstance(until, int):
                     at = until
                 else:
@@ -186,3 +250,4 @@ class Environment:
                     f'No scheduled events left but "until" event was not '
                     f'triggered: {until}'
                 )
+        return None

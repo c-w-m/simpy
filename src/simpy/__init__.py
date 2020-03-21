@@ -10,6 +10,7 @@ The following tables list all of the available components in this module.
 """
 from pkg_resources import get_distribution
 from pkgutil import extend_path
+from typing import List, Tuple, Type
 
 from simpy.core import Environment
 from simpy.rt import RealtimeEnvironment
@@ -22,7 +23,10 @@ from simpy.resources.store import (
     Store, PriorityItem, PriorityStore, FilterStore)
 
 
-def compile_toc(entries, section_marker='='):
+def compile_toc(
+    entries: Tuple[Tuple[str, Tuple[Type, ...]], ...],
+    section_marker: str = '=',
+) -> str:
     """Compiles a list of sections with objects into sphinx formatted
     autosummary directives."""
     toc = ''
@@ -57,5 +61,5 @@ if __doc__:
     __doc__ = __doc__.format(toc=compile_toc(toc))
 __all__ = [obj.__name__ for section, objs in toc for obj in objs]
 
-__path__ = extend_path(__path__, __name__)
-__version__ = get_distribution('simpy').version
+__path__: List[str] = list(extend_path(__path__, __name__))
+__version__: str = get_distribution('simpy').version

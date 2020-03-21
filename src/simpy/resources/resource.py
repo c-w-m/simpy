@@ -28,7 +28,11 @@ processes can define a request priority, and a :class:`PreemptiveResource`
 whose resource users can be preempted by requests with a higher priority.
 
 """
-from simpy.core import BoundClass
+from types import TracebackType
+from typing import TYPE_CHECKING, Any, List, Optional, Type
+
+from simpy.core import BoundClass, Environment, SimTime
+from simpy.events import Process
 from simpy.resources import base
 
 
@@ -37,7 +41,13 @@ class Preempted:
     information about the preemption.
 
     """
-    def __init__(self, by, usage_since, resource):
+
+    def __init__(
+        self,
+        by: Optional[Process],
+        usage_since: Optional[SimTime],
+        resource: 'Resource',
+    ):
         self.by = by
         """The preempting :class:`simpy.events.Process`."""
         self.usage_since = usage_since
@@ -60,8 +70,19 @@ class Request(base.Put):
     a :keyword:`with` statement.
 
     """
-    def __exit__(self, exc_type, value, traceback):
-        super().__exit__(exc_type, value, traceback)
+
+    resource: 'Resource'
+
+    #: The time at which the request succeeded.
+    usage_since: Optional[SimTime] = None
+
+    def __exit__(
+        self,
+        exc_type: Optional[Type[Exception]],
+        exc_value: Optional[Exception],
+        traceback: Optional[TracebackType],
+    ) -> None:
+        super().__exit__(exc_type, exc_value, traceback)
         # Don't release the resource on generator cleanups. This seems to
         # create unclaimable circular references otherwise.
         if exc_type is not GeneratorExit:
@@ -73,7 +94,8 @@ class Release(base.Get):
     triggered immediately. Subclass of :class:`simpy.resources.base.Get`.
 
     """
-    def __init__(self, resource, request):
+
+    def __init__(self, resource: 'Resource', request: Request):
         self.request = request
         """The request (:class:`Request`) that is to be released."""
         super().__init__(resource)
@@ -90,7 +112,10 @@ class PriorityRequest(Request):
     :class:`PreemptiveResource`
 
     """
-    def __init__(self, resource, priority=0, preempt=True):
+
+    def __init__(
+        self, resource: 'Resource', priority: int = 0, preempt: bool = True
+    ):
         self.priority = priority
         """The priority of this request. A smaller number means higher
         priority."""
@@ -101,9 +126,6 @@ class PriorityRequest(Request):
 
         self.time = resource._env.now
         """The time at which the request was made."""
-
-        self.usage_since = None
-        """The time at which the request succeeded."""
 
         self.key = (self.priority, self.time, not self.preempt)
         """Key for sorting events. Consists of the priority (lower value is
@@ -119,12 +141,13 @@ class SortedQueue(list):
     attribute.
 
     """
-    def __init__(self, maxlen=None):
+
+    def __init__(self, maxlen: Optional[int] = None):
         super().__init__()
         self.maxlen = maxlen
         """Maximum length of the queue."""
 
-    def append(self, item):
+    def append(self, item: Any) -> None:
         """Sort *item* into the queue.
 
         Raise a :exc:`RuntimeError` if the queue is full.
@@ -148,13 +171,14 @@ class Resource(base.BaseResource):
     resource is bound to.
 
     """
-    def __init__(self, env, capacity=1):
+
+    def __init__(self, env: Environment, capacity: int = 1):
         if capacity <= 0:
             raise ValueError('"capacity" must be > 0.')
 
         super().__init__(env, capacity)
 
-        self.users = []
+        self.users: List[Request] = []
         """List of :class:`Request` events for the processes that are currently
         using the resource."""
         self.queue = self.put_queue
@@ -163,25 +187,34 @@ class Resource(base.BaseResource):
         """
 
     @property
-    def count(self):
+    def count(self) -> int:
         """Number of users currently using the resource."""
         return len(self.users)
 
-    request = BoundClass(Request)
-    """Request a usage slot."""
+    if TYPE_CHECKING:
 
-    release = BoundClass(Release)
-    """Release a usage slot."""
+        def request(self) -> Request:
+            return Request(self)
 
-    def _do_put(self, event):
+        def release(self, request: Request) -> Release:
+            return Release(self, request)
+
+    else:
+        request = BoundClass(Request)
+        """Request a usage slot."""
+
+        release = BoundClass(Release)
+        """Release a usage slot."""
+
+    def _do_put(self, event: Request) -> None:
         if len(self.users) < self.capacity:
             self.users.append(event)
             event.usage_since = self._env.now
             event.succeed()
 
-    def _do_get(self, event):
+    def _do_get(self, event: Release) -> None:
         try:
-            self.users.remove(event.request)
+            self.users.remove(event.request)  # type: ignore
         except ValueError:
             pass
         event.succeed()
@@ -195,21 +228,36 @@ class PriorityResource(Resource):
     order by their *priority* (that means lower values are more important).
 
     """
+
     PutQueue = SortedQueue
     """Type of the put queue. See
     :attr:`~simpy.resources.base.BaseResource.put_queue` for details."""
+
     GetQueue = list
     """Type of the get queue. See
     :attr:`~simpy.resources.base.BaseResource.get_queue` for details."""
 
-    def __init__(self, env, capacity=1):
+    def __init__(self, env: Environment, capacity: int = 1):
         super().__init__(env, capacity)
 
-    request = BoundClass(PriorityRequest)
-    """Request a usage slot with the given *priority*."""
+    if TYPE_CHECKING:
 
-    release = BoundClass(Release)
-    """Release a usage slot."""
+        def request(
+            self, priority: int = 0, preempt: bool = True
+        ) -> PriorityRequest:
+            return PriorityRequest(self, priority, preempt)
+
+        def release(  # type: ignore[override] # noqa: F821
+            self, request: PriorityRequest
+        ) -> Release:
+            return Release(self, request)
+
+    else:
+        request = BoundClass(PriorityRequest)
+        """Request a usage slot with the given *priority*."""
+
+        release = BoundClass(Release)
+        """Release a usage slot."""
 
 
 class PreemptiveResource(PriorityResource):
@@ -220,14 +268,23 @@ class PreemptiveResource(PriorityResource):
     cause.
 
     """
-    def _do_put(self, event):
+
+    users: List[PriorityRequest]  # type: ignore
+
+    def _do_put(  # type: ignore[override] # noqa: F821
+        self, event: PriorityRequest
+    ) -> None:
         if len(self.users) >= self.capacity and event.preempt:
             # Check if we can preempt another process
             preempt = sorted(self.users, key=lambda e: e.key)[-1]
             if preempt.key > event.key:
                 self.users.remove(preempt)
-                preempt.proc.interrupt(Preempted(
-                    by=event.proc, usage_since=preempt.usage_since,
-                    resource=self))
+                preempt.proc.interrupt(  # type: ignore
+                    Preempted(
+                        by=event.proc,
+                        usage_since=preempt.usage_since,
+                        resource=self,
+                    )
+                )
 
         return super()._do_put(event)

@@ -7,8 +7,13 @@ Tankers increase and refuelled cars decrease the amount of gas in the station's
 fuel tanks.
 
 """
-from simpy.core import BoundClass
+from typing import TYPE_CHECKING, Optional, Union
+
+from simpy.core import BoundClass, Environment
 from simpy.resources import base
+
+
+ContainerAmount = Union[int, float]
 
 
 class ContainerPut(base.Put):
@@ -18,7 +23,8 @@ class ContainerPut(base.Put):
     Raise a :exc:`ValueError` if ``amount <= 0``.
 
     """
-    def __init__(self, container, amount):
+
+    def __init__(self, container: 'Container', amount: ContainerAmount):
         if amount <= 0:
             raise ValueError(f'amount(={amount}) must be > 0.')
         self.amount = amount
@@ -34,7 +40,8 @@ class ContainerGet(base.Get):
     Raise a :exc:`ValueError` if ``amount <= 0``.
 
     """
-    def __init__(self, container, amount):
+
+    def __init__(self, container: 'Container', amount: ContainerAmount):
         if amount <= 0:
             raise ValueError(f'amount(={amount}) must be > 0.')
         self.amount = amount
@@ -59,7 +66,13 @@ class Container(base.BaseResource):
     ``init > capacity``.
 
     """
-    def __init__(self, env, capacity=float('inf'), init=0):
+
+    def __init__(
+        self,
+        env: Environment,
+        capacity: ContainerAmount = float('inf'),
+        init: ContainerAmount = 0,
+    ):
         if capacity <= 0:
             raise ValueError('"capacity" must be > 0.')
         if init < 0:
@@ -72,24 +85,41 @@ class Container(base.BaseResource):
         self._level = init
 
     @property
-    def level(self):
+    def level(self) -> ContainerAmount:
         """The current amount of the matter in the container."""
         return self._level
 
-    put = BoundClass(ContainerPut)
-    """Request to put *amount* of matter into the container."""
+    if TYPE_CHECKING:
 
-    get = BoundClass(ContainerGet)
-    """Request to get *amount* of matter out of the container."""
+        def put(  # type: ignore[override] # noqa: F821
+            self, amount: ContainerAmount
+        ) -> ContainerPut:
+            return ContainerPut(self, amount)
 
-    def _do_put(self, event):
+        def get(  # type: ignore[override] # noqa: F821
+            self, amount: ContainerAmount
+        ) -> ContainerGet:
+            return ContainerGet(self, amount)
+
+    else:
+        put = BoundClass(ContainerPut)
+        """Request to put *amount* of matter into the container."""
+
+        get = BoundClass(ContainerGet)
+        """Request to get *amount* of matter out of the container."""
+
+    def _do_put(self, event: ContainerPut) -> Optional[bool]:
         if self._capacity - self._level >= event.amount:
             self._level += event.amount
             event.succeed()
             return True
+        else:
+            return None
 
-    def _do_get(self, event):
+    def _do_get(self, event: ContainerGet) -> Optional[bool]:
         if self._level >= event.amount:
             self._level -= event.amount
             event.succeed()
             return True
+        else:
+            return None

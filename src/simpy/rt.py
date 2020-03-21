@@ -4,7 +4,7 @@ with the real-time (aka *wall-clock time*).
 """
 from time import monotonic, sleep
 
-from simpy.core import Environment, EmptySchedule, Infinity
+from simpy.core import Environment, EmptySchedule, Infinity, SimTime
 
 
 class RealtimeEnvironment(Environment):
@@ -20,7 +20,13 @@ class RealtimeEnvironment(Environment):
     *strict* to ``False``.
 
     """
-    def __init__(self, initial_time=0, factor=1.0, strict=True):
+
+    def __init__(
+        self,
+        initial_time: SimTime = 0,
+        factor: float = 1.0,
+        strict: bool = True,
+    ):
         Environment.__init__(self, initial_time)
 
         self.env_start = initial_time
@@ -29,18 +35,18 @@ class RealtimeEnvironment(Environment):
         self._strict = strict
 
     @property
-    def factor(self):
+    def factor(self) -> float:
         """Scaling factor of the real-time."""
         return self._factor
 
     @property
-    def strict(self):
+    def strict(self) -> bool:
         """Running mode of the environment. :meth:`step()` will raise a
         :exc:`RuntimeError` if this is set to ``True`` and the processing of
         events takes too long."""
         return self._strict
 
-    def sync(self):
+    def sync(self) -> None:
         """Synchronize the internal time with the current wall-clock time.
 
         This can be useful to prevent :meth:`step()` from raising an error if
@@ -50,7 +56,7 @@ class RealtimeEnvironment(Environment):
         """
         self.real_start = monotonic()
 
-    def step(self):
+    def step(self) -> None:
         """Process the next event after enough real-time has passed for the
         event to happen.
 
@@ -83,4 +89,4 @@ class RealtimeEnvironment(Environment):
                 break
             sleep(delta)
 
-        return Environment.step(self)
+        Environment.step(self)

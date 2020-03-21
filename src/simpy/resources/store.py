@@ -9,9 +9,17 @@ matching a given criterion.
 
 """
 from heapq import heappush, heappop
-from collections import namedtuple
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    List,
+    NamedTuple,
+    Optional,
+    Union,
+)
 
-from simpy.core import BoundClass
+from simpy.core import BoundClass, Environment
 from simpy.resources import base
 
 
@@ -20,7 +28,8 @@ class StorePut(base.Put):
     there is space for the item in the store.
 
     """
-    def __init__(self, store, item):
+
+    def __init__(self, store: 'Store', item: Any):
         self.item = item
         """The item to put into the store."""
         super().__init__(store)
@@ -31,7 +40,6 @@ class StoreGet(base.Get):
     once there is an item available in the store.
 
     """
-    pass
 
 
 class FilterStoreGet(StoreGet):
@@ -44,7 +52,12 @@ class FilterStoreGet(StoreGet):
     :class:`StoreGet`.
 
     """
-    def __init__(self, resource, filter=lambda item: True):
+
+    def __init__(
+        self,
+        resource: 'FilterStore',
+        filter: Callable[[Any], bool] = lambda item: True,
+    ):
         self.filter = filter
         """The filter function to filter items in the store."""
         super().__init__(resource)
@@ -59,32 +72,48 @@ class Store(base.BaseResource):
     container is bound to.
 
     """
-    def __init__(self, env, capacity=float('inf')):
+
+    def __init__(
+        self, env: Environment, capacity: Union[float, int] = float('inf')
+    ):
         if capacity <= 0:
             raise ValueError('"capacity" must be > 0.')
 
         super().__init__(env, capacity)
 
-        self.items = []
+        self.items: List[Any] = []
         """List of the items available in the store."""
 
-    put = BoundClass(StorePut)
-    """Request to put *item* into the store."""
+    if TYPE_CHECKING:
 
-    get = BoundClass(StoreGet)
-    """Request to get an *item* out of the store."""
+        def put(  # type: ignore[override] # noqa: F821
+            self, item: Any
+        ) -> StorePut:
+            return StorePut(self, item)
 
-    def _do_put(self, event):
+        def get(self) -> StoreGet:  # type: ignore[override] # noqa: F821
+            return StoreGet(self)
+
+    else:
+        put = BoundClass(StorePut)
+        """Request to put *item* into the store."""
+
+        get = BoundClass(StoreGet)
+        """Request to get an *item* out of the store."""
+
+    def _do_put(self, event: StorePut) -> Optional[bool]:
         if len(self.items) < self._capacity:
             self.items.append(event.item)
             event.succeed()
+        return None
 
-    def _do_get(self, event):
+    def _do_get(self, event: StoreGet) -> Optional[bool]:
         if self.items:
             event.succeed(self.items.pop(0))
+        return None
 
 
-class PriorityItem(namedtuple('PriorityItem', 'priority item')):
+class PriorityItem(NamedTuple):
     """Wrap an arbitrary *item* with an orderable *priority*.
 
     Pairs a *priority* with an arbitrary *item*. Comparisons of *PriorityItem*
@@ -93,7 +122,15 @@ class PriorityItem(namedtuple('PriorityItem', 'priority item')):
 
     """
 
-    def __lt__(self, other):
+    #: Priority of the item.
+    priority: Any
+
+    #: The item to be stored.
+    item: Any
+
+    def __lt__(  # type: ignore[override] # noqa: F821
+        self, other: 'PriorityItem'
+    ) -> bool:
         return self.priority < other.priority
 
 
@@ -110,14 +147,16 @@ class PriorityStore(Store):
 
     """
 
-    def _do_put(self, event):
+    def _do_put(self, event: StorePut) -> Optional[bool]:
         if len(self.items) < self._capacity:
             heappush(self.items, event.item)
             event.succeed()
+        return None
 
-    def _do_get(self, event):
+    def _do_get(self, event: StoreGet) -> Optional[bool]:
         if self.items:
             event.succeed(heappop(self.items))
+        return None
 
 
 class FilterStore(Store):
@@ -142,14 +181,21 @@ class FilterStore(Store):
 
     """
 
-    put = BoundClass(StorePut)
-    """Request to put *item* into the store."""
+    if TYPE_CHECKING:
 
-    get = BoundClass(FilterStoreGet)
-    """Request to get an *item*, for which *filter* returns ``True``, out of the
-    store."""
+        def get(
+            self, filter: Callable[[Any], bool] = lambda item: True
+        ) -> FilterStoreGet:
+            return FilterStoreGet(self, filter)
 
-    def _do_get(self, event):
+    else:
+        get = BoundClass(FilterStoreGet)
+        """Request to get an *item*, for which *filter* returns ``True``, out of
+        the store."""
+
+    def _do_get(  # type: ignore[override] # noqa: F821
+        self, event: FilterStoreGet
+    ) -> Optional[bool]:
         for item in self.items:
             if event.filter(item):
                 self.items.remove(item)
