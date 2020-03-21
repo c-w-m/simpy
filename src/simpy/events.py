@@ -77,13 +77,13 @@ class Event:
 
     _ok: bool
     _defused: bool
+    _value: Any = PENDING
 
     def __init__(self, env: 'Environment'):
         self.env = env
         """The :class:`~simpy.core.Environment` the event lives in."""
         self.callbacks: EventCallbacks = []
         """List of functions that are called when the event is processed."""
-        self._value: Any = PENDING
 
     def __repr__(self) -> str:
         """Return the description of the event (see :meth:`_desc`) with the id
@@ -341,7 +341,6 @@ class Process(Event):
         # Event.__init__() for performance reasons.
         self.env = env
         self.callbacks: EventCallbacks = []
-        self._value: Any = PENDING
 
         self._generator = generator
 
