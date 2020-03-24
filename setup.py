@@ -4,7 +4,6 @@ from setuptools import setup, find_packages
 
 setup(
     name='simpy',
-    version='3.0.12',
     author='Ontje Lünsdorf, Stefan Scherfke',
     author_email='the_com@gmx.de, stefan@sofa-rockers.org',
     description='Event discrete, process based simulation for Python.',
@@ -13,6 +12,8 @@ setup(
         for f in ['README.rst', 'CHANGES.rst', 'AUTHORS.rst']),
     url='https://simpy.readthedocs.io',
     license='MIT License',
+    use_scm_version=True,
+    setup_requires=['setuptools_scm'],
     install_requires=[],
     packages=find_packages(where='src'),
     package_dir={'': 'src'},
