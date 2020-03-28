@@ -4,8 +4,10 @@
 *.swp
 *~
 .DS_Store
+.benchmarks/
 .cache/
 .coverage
+.eggs/
 .env
 .ropeproject/
 .tox/
