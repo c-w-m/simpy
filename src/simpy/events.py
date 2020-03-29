@@ -405,9 +405,10 @@ class Process(Event):
             except AttributeError:
                 # Our optimism didn't work out, figure out what went wrong and
                 # inform the user.
-                if not hasattr(event, 'callbacks'):
-                    msg = 'Invalid yield value "%s"' % event
+                if hasattr(event, 'callbacks'):
+                    raise
 
+                msg = 'Invalid yield value "%s"' % event
                 descr = _describe_frame(self._generator.gi_frame)
                 error = RuntimeError('\n%s%s' % (descr, msg))
                 # Drop the AttributeError as the cause for this exception.
