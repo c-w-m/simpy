@@ -20,6 +20,7 @@ you are looking for.
    real-time-simulations
    monitoring
    time_and_scheduling
+   porting_from_simpy3
    porting_from_simpy2
 
 .. - analyzing results (numpy, matploblib, ...)
