@@ -3,6 +3,7 @@ image: python
 stages:
   - build
   - test
+  - deploy
 
 build:
   stage: build
@@ -72,3 +73,21 @@ flake8:
   script:
     - pip install tox
     - tox -e flake8
+
+twine-check:
+  stage: test
+  dependencies:
+    - build
+  script:
+    - python -m pip install twine
+    - python -m twine check dist/*
+
+pypi:
+  stage: deploy
+  dependencies:
+    - build
+  only:
+    - tags
+  script:
+    - python -m pip install twine
+    - python -m twine upload --non-interactive dist/*
