@@ -8,13 +8,13 @@ build:
   stage: build
   script:
     - python setup.py sdist
-    - pip install dist/*.tar.gz
+    - python -m pip install dist/*.tar.gz
     - python -c 'import simpy; print(simpy.__version__)'
-    - pip uninstall --yes --quiet simpy
+    - python -m pip uninstall --yes --quiet simpy
     - python setup.py bdist_wheel
-    - pip install dist/*.whl
+    - python -m pip install dist/*.whl
     - python -c 'import simpy; print(simpy.__version__)'
-    - pip uninstall --yes --quiet simpy
+    - python -m pip uninstall --yes --quiet simpy
   artifacts:
     paths:
       - dist
@@ -24,42 +24,42 @@ python27:
   stage: test
   script:
     - pip install tox
-    - tox -e 'py27'
+    - tox -e py27
 
 python36:
   image: python:3.6
   stage: test
   script:
     - pip install tox
-    - tox -e 'py36'
+    - tox -e py36
 
 python37:
   image: python:3.7
   stage: test
   script:
     - pip install tox
-    - tox -e 'py37'
+    - tox -e py37
 
 python38:
   image: python:3.8
   stage: test
   script:
     - pip install tox
-    - tox -e 'py38'
+    - tox -e py38
 
 pypy2:
   image: pypy:2
   stage: test
   script:
     - pip install tox
-    - tox -e 'pypy'
+    - tox -e pypy
 
 pypy3:
   image: pypy:3
   stage: test
   script:
     - pip install tox
-    - tox -e 'pypy3'
+    - tox -e pypy3
 
 doctest:
   stage: test
