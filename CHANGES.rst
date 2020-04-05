@@ -1,6 +1,14 @@
 Changelog for SimPy
 ===================
 
+3.0.13 - 2020-03-05
+-------------------
+
+- [FIX] Repair several minor typos in documentation
+- [FIX] Possible AttributeError in Process._resume()
+- [CHANGE] Use setuptools_scm in distribution build
+
+
 3.0.12 - 2020-03-12
 -------------------
 
