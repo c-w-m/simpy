@@ -24,47 +24,47 @@ python36:
   image: python:3.6
   stage: test
   script:
-    - pip install tox
-    - tox -e py36
+    - python -m pip install tox
+    - python -m tox -e py36
 
 python37:
   image: python:3.7
   stage: test
   script:
-    - pip install tox
-    - tox -e py37
+    - python -m pip install tox
+    - python -m tox -e py37
 
 python38:
   image: python:3.8
   stage: test
   script:
-    - pip install tox
-    - tox -e py38
+    - python -m pip install tox
+    - python -m tox -e py38
 
 pypy3:
   image: pypy:3
   stage: test
   script:
-    - pip install tox
-    - tox -e pypy3
+    - pypy3 -m pip install tox
+    - pypy3 -m tox -e pypy3
 
 doctest:
   stage: test
   script:
-    - pip install tox
-    - tox -e docs
+    - python -m pip install tox
+    - python -m tox -e docs
 
 flake8:
   stage: test
   script:
-    - pip install tox
-    - tox -e flake8
+    - python -m pip install tox
+    - python -m tox -e flake8
 
 mypy:
   stage: test
   script:
-    - pip install tox
-    - tox -e mypy
+    - python -m pip install tox
+    - python -m tox -e mypy
 
 twine-check:
   stage: test
