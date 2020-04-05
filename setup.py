@@ -10,6 +10,7 @@ setup(
     long_description='\n\n'.join(
         open(f, 'rb').read().decode('utf-8')
         for f in ['README.rst', 'CHANGES.rst', 'AUTHORS.rst']),
+    long_description_content_type='text/x-rst',
     url='https://simpy.readthedocs.io',
     license='MIT License',
     use_scm_version=True,
