@@ -1,7 +1,18 @@
 Changelog for SimPy
 ===================
 
-3.0.13 - 2020-03-05
+4.0.0 - 2020-04-06
+------------------
+
+- [BREAKING] Python 3.6 is the minimum supported version
+- [BREAKING] ``BaseEnvironment`` is eliminated. Inherit ``Environment`` instead.
+- [BREAKING] ``Environment.exit()`` is eliminated. Use ``return`` instead.
+- [NEW] "Porting from SimPy 3 to 4" topical guide in docs
+- [NEW] SimPy is now fully type annotated (PEP-483, PEP-484)
+- [NEW] PEP-517/PEP-518 compatible build system
+
+
+3.0.13 - 2020-04-05
 -------------------
 
 - [FIX] Repair several minor typos in documentation
