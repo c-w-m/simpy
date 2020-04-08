@@ -10,6 +10,7 @@ from types import TracebackType
 from typing import (
     TYPE_CHECKING,
     ClassVar,
+    ContextManager,
     Generic,
     MutableSequence,
     Optional,
@@ -24,7 +25,7 @@ from simpy.events import Event, Process
 ResourceType = TypeVar('ResourceType', bound='BaseResource')
 
 
-class Put(Event, Generic[ResourceType]):
+class Put(Event, ContextManager['Put'], Generic[ResourceType]):
     """Generic event for requesting to put something into the *resource*.
 
     This event (and all of its subclasses) can act as context manager and can
@@ -53,11 +54,12 @@ class Put(Event, Generic[ResourceType]):
 
     def __exit__(
         self,
-        exc_type: Optional[Type[Exception]],
-        exc_value: Optional[Exception],
+        exc_type: Optional[Type[BaseException]],
+        exc_value: Optional[BaseException],
         traceback: Optional[TracebackType],
-    ) -> None:
+    ) -> Optional[bool]:
         self.cancel()
+        return None
 
     def cancel(self) -> None:
         """Cancel this put request.
@@ -74,7 +76,7 @@ class Put(Event, Generic[ResourceType]):
             self.resource.put_queue.remove(self)
 
 
-class Get(Event, Generic[ResourceType]):
+class Get(Event, ContextManager['Get'], Generic[ResourceType]):
     """Generic event for requesting to get something from the *resource*.
 
     This event (and all of its subclasses) can act as context manager and can
@@ -103,11 +105,12 @@ class Get(Event, Generic[ResourceType]):
 
     def __exit__(
         self,
-        exc_type: Optional[Type[Exception]],
-        exc_value: Optional[Exception],
+        exc_type: Optional[Type[BaseException]],
+        exc_value: Optional[BaseException],
         traceback: Optional[TracebackType],
-    ) -> None:
+    ) -> Optional[bool]:
         self.cancel()
+        return None
 
     def cancel(self) -> None:
         """Cancel this get request.
