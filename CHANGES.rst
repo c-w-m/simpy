@@ -1,6 +1,12 @@
 Changelog for SimPy
 ===================
 
+4.0.1 - 2020-04-15
+------------------
+
+- [FIX] Typing repair for Get and Put as ContextManagers
+
+
 4.0.0 - 2020-04-06
 ------------------
 
